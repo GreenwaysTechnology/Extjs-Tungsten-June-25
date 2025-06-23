@@ -1,22 +1,11 @@
-var a = 10
-var b = 10
-
-if (a == b) {
-    console.log('equal')
-} else {
-    console.log('not equal')
+var emp = {
+    id: 1,
+    name: 'Subramanian',
+    status: true,
+    //has-a
+    address: {
+        state:'Tamil Nadu',
+        city:'Coimbatore'
+    }
 }
-var x = "100"
-var y = 100
-
-if (x == y) {
-    console.log('equal')
-} else {
-    console.log('not equal')
-}
-
-if (x === y) {
-    console.log('equal')
-} else {
-    console.log('not equal')
-}
+console.log(emp.id, emp.name, emp.address.city, emp.address.state)

@@ -295,6 +295,336 @@ if (x === y) {
     console.log('x and y are not equal')
 }
 **********************************************************************************************************************************************************
+											functions
+**********************************************************************************************************************************************************
+
+Declare functions:
+function sayHello() {
+    console.log('Hello')
+}
+//invoke funciton
+sayHello()
+
+params and args:
+.............................
+Javascript is type less. we can pass any value.
+
+//args
+function add(a, b) {
+    console.log(a,b)
+}
+//params
+add(10, 10)
+add("10",10)
+
+computation and default values
+.....................................................
+//args
+function add(a = 0, b = 0) {
+    return a + b
+}
+//params
+console.log(add(10, 10))
+console.log(add("10", 10))
+console.log(add())
+****************************************************************************************************************************************************
+									 Functional Programming and its core principles
+..............................................................................................................................................................................................................................
+According to functional programming, function is just value like numbers, strings
+
+var a=10
+ 
+var - keyword
+a - variable
+10 - value /literal - number
+
+since function is value can be assigned to a variable.
+If you assign the function with variable, then that function can be called with variableName.
+if you declare function with variables, without function name called "Anonymous function".
+
+let a = 10
+//hello is variable
+//var is keyowrd
+//function(){} - function is value
+var hello = function () {
+    console.log('Hello')
+}
+//that variable can be used to invoke that function
+hello()
+
+//anonymous function with args and return value
+
+var multiply = function (a = 0, b = 0) {
+    return a * b
+}
+console.log(multiply(2,5))
+
+Higher Order function:
+.....................................
+How function is assigned to a variable, similarly we can pass function as parameter to another function as value and also we can return function from the another function.
+
+Use case : Passing function as parameter : HOF
+
+//greet = function(){}
+function hello(greet) {
+    greet()
+}
+
+var welcome = function () {
+    console.log('welcome')
+}
+hello(welcome)
+
+hello(function () {
+    console.log('Hello')
+})
+
+//Higher order function with params and args
+
+function fetchData(callback) {
+    callback('Hey How are you?')
+}
+fetchData(function (message) {
+    console.log(message)
+})
+***********************************************************************************************************************************************************
+									 Returning function from another function - Higher order function
+**********************************************************************************************************************************************************
+function greet() {
+    // var hello = function () {
+    //     console.log('hello')
+    // }
+    // return hello
+    return function () {
+        console.log('hello')
+    }
+}
+var res = greet()
+res()
+**********************************************************************************************************************************************************
+											Objects
+*********************************************************************************************************************************************************
+How to create Object?
+
+In class based languages, objects are created out of classes but in js Objects are created in ways
+
+1.Constructor pattern
+   Using class like construct
+2.Literal Pattern
+   No classes, like literals
+
+1.Constructor pattern
+   Using class like construct
+ 
+1.1.Using functions - ES 5 Style - old style
+1.2.Using classes  - ES 6 style - modern
+
+functions:
+ 1. to have /to declare biz logic
+ 2. to declare classes 
+
+Step 1:
+ declare function with Uppercase/Noun
+
+function Employee(){
+    
+}
+
+Step 2:
+ instance variables
+function Employee() {
+    //instance variables
+    this.id = 1
+    this.name = 'Subramanian'
+    this.salary = 10000
+}
+
+Step 3: 
+ Create instance 
+//class declaration using function
+
+function Employee() {
+    //instance variables
+    this.id = 1
+    this.name = 'Subramanian'
+    this.salary = 10000
+    this.isValid = true
+}
+
+//var -keyword
+//emp - is just reference variable which points object in heap
+//new is keyword - memory allocation opertaor
+//Employee() -  constructor call
+var emp = new Employee()
+console.log(emp)
+console.log(emp.id,emp.name,emp.salary,emp.isValid)
+
+...............................................................................................................................................................................................................................
+											State/instance  initialization
+..................................................................................................................................................................................................................................
+
+1.inside function directly
+2.inside inside constructor
+3.outside function using reference variable
+
+
+1.inside function directly
+
+function Employee() {
+    //instance variables
+    this.id = 1
+    this.name = 'Subramanian'
+    this.salary = 10000
+    this.isValid = true
+}
+
+2.outside function 
+//class declaration using function
+
+function Employee() {
+    //instance variables
+    this.id = 1
+    this.name = 'Subramanian'
+    this.salary = 10000
+    this.isValid = true
+}
+
+//var -keyword
+//emp - is just reference variable which points object in heap
+//new is keyword - memory allocation opertaor
+//Employee() -  constructor call
+var emp = new Employee()
+console.log(emp)
+console.log(emp.id, emp.name, emp.salary, emp.isValid)
+emp.id = 90
+emp.name = 'Ram'
+emp.salary = 8133
+emp.isValid = true
+console.log(emp.id, emp.name, emp.salary, emp.isValid)
+
+3.Using constructors : you can initalize during object creation
+//class declaration using function
+
+//Employee is constructor function
+
+function Employee(id = 0, name = '', salary = 0, isValid = false) {
+    //instance variables
+    this.id = id
+    this.name = name
+    this.salary = salary
+    this.isValid = isValid
+}
+
+//var -keyword
+//emp - is just reference variable which points object in heap
+//new is keyword - memory allocation opertaor
+//Employee() -  constructor call
+var emp = new Employee(1,'Subramanian',123.823,true)
+console.log(emp.id, emp.name, emp.salary, emp.isValid)
+
+How to create multiple instances?
+
+function Employee(id = 0, name = '', salary = 0, isValid = false) {
+    //instance variables
+    this.id = id
+    this.name = name
+    this.salary = salary
+    this.isValid = isValid
+}
+var emp = new Employee(1,'Subramanian',123.823,true)
+console.log(emp.id, emp.name, emp.salary, emp.isValid)
+
+var emp1 =new Employee(3,'Ram',3333.823,true)
+console.log(emp1.id, emp1.name, emp1.salary, emp1.isValid)
+
+
+How to delcare methods?
+function Employee(id = 0, name = '', salary = 0, isValid = false) {
+    //local variables
+    var noOfDays = 100
+    //instance variables
+    this.id = id
+    this.name = name
+    this.salary = salary
+    this.isValid = isValid
+    //instance methods
+    this.getSalary = function () {
+        return this.salary * noOfDays
+    }
+}
+var emp = new Employee(1, 'Subramanian', 100, true)
+console.log(emp.id, emp.name, emp.getSalary(), emp.isValid)
+********************************************************************************************************************************************************
+										literal pattern
+*********************************************************************************************************************************************************
+No class(function), objects are created out of literal syntax.
+//var is keyword
+//emp is just variable  which points object reference
+var emp = {
+    id: 1,
+    name: 'Subramanian',
+    status: true
+}
+console.log(emp)
+console.log(emp.id,emp.name,emp.status)
+
+literal methods:
+......................
+var emp = {
+    id: 1,
+    name: 'Subramanian',
+    status: true,
+    calculate: function (value = 0) {
+        return value
+    }
+}
+console.log(emp)
+console.log(emp.id, emp.name, emp.status, emp.calculate(12323))
+
+Nested Objects  (has-a)
+.......................................
+//has a
+function Employee(id = 0, name = '', salary = 0, isValid = false, address) {
+    //local variables
+    var noOfDays = 100
+    //instance variables
+    this.id = id
+    this.name = name
+    this.salary = salary
+    this.isValid = isValid
+    //has -a
+    this.address = address
+    //instance methods
+    this.getSalary = function () {
+        return this.salary * noOfDays
+    }
+}
+function Address(city = "", state = "") {
+    this.city = city
+    this.state = state
+}
+let emp = new Employee(1, "Subramnaian", 22323.89, true, new Address('Coimbatore', 'TamilNadue'))
+console.log(emp.id, emp.name, emp.address.city, emp.address.state)
+
+Literal has-a:
+....................
+var emp = {
+    id: 1,
+    name: 'Subramanian',
+    status: true,
+    //has-a
+    address: {
+        state:'Tamil Nadu',
+        city:'Coimbatore'
+    }
+}
+console.log(emp.id, emp.name, emp.address.city, emp.address.state)
+***********************************************************************************************************************************************************
+
+
+
+
+				
 
 
 

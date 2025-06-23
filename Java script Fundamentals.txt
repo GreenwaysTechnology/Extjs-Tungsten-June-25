@@ -1,0 +1,301 @@
+											Java script Fundamentals
+...........................................................................................................................................................................................................................................
+
+What is java script ?
+     Java script is also the programming language.
+     Java script is multi style programming language 
+        -> Object based
+       ->  Functional style
+
+Object based vs Object oriented
+
+OO Principles
+
+1.Abstraction
+2.Encapsulation
+3.Typing
+4.Hierachy
+5.Modularity
+..........................................................
+6.Concurrency
+7.Persistency
+If any language follows the first 5 principles, those language is called object oriented language, rest of the language called object based language
+
+ Functional style
+    JavaScript was created from the language called scheme , which is pure functional programming language.
+
+JavaScript language created for browsers in 1995 for building dynamic web pages by Netscape Communication.
+
+
+After JavaScript language created, the language was submitted to standard body called  "ECMA"  international
+
+After submission, the language was standardized and released by committee.
+
+1.ES 1.0 -->1996
+2.ES 3.0 -->1999
+3.ES 4.0 -->2006
+4.ES 5.0 --->2007
+5.ES 6.0 --->2012-2015
+6.ES 7.0 ----->2016
+etc.....
+
+We are going to focus the ES 5.0 features
+
+JavaScript learning path(ES5):
+...................................................
+1.Language fundamentals
+2.Functions 
+3.Objects
+......................................................................................................................................................................................................................................
+									Language fundamentals
+*********************************************************************************************************************************************************
+1.Language fundamentals
+ ->Variables
+ ->Literals
+ ->Type Systems
+
+Project setup
+G:\Tungsten>mkdir jsapps
+G:\Tungsten>cd jsapps
+G:\Tungsten\jsapps>
+G:\Tungsten\jsapps>code .
+G:\Tungsten\jsapps>mkdir src
+
+Where we can run js code?
+
+1.Browser
+2.server - node.js
+
+In Browser, there is embedded js runtime, which runs the js code.
+
+Every Browser has there own runtimes to run js code
+
+1.Chrome - V8 engine
+2.Edge  - Chakra 
+3.Firefox -  Spider Monkey
+
+jsapps/src/index.js
+console.log('Hello Javascript')
+console.log('Welcome to javascript!')
+
+jsapps/index.html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Javascript Apps</title>
+    <script></script>
+</head>
+
+<body>
+    <h1>JS Apps</h1>
+    <script src="src/index.js" ></script>
+</body>
+
+</html>
+........................................................................................................................................................................................................................................
+										Data Types, variables, Literals
+........................................................................................................................................................................................................................................
+
+var, let, const -keywords to declare variables
+
+ let /const - es 6 keywords
+eg:
+var VariableName
+var firstName
+
+2.literals -values
+   strings,numbers,boolean,undefined,NaN,infinity,function,null,object
+
+3.Data types
+   Js is dynamic typed language-the type of variable is understood only during runtime.
+  int a =10 - strongly typed
+  let | var a =20 - dynamic typed
+
+
+ literal   - type
+....................
+  string    - string
+  number    - number
+  boolean   - boolean
+  undefined   - undefined
+  NaN       - number
+  Infinity  -  number
+  function  - function
+  object    - object
+  null      - object
+
+
+JS is dynamically typed, so type is not declared in advance, type of variables are decided during runtime, based on "literals-values"
+
+Js has 9 literals but only 6 types.
+
+strings,numbers,boolean,undefined,object,function- types
+
+
+Strings:
+//strings : "",'',``,`${}`(string interpolation)
+//Strings
+let firstName = "Subramanian"
+let lastName = 'Murugan'
+//back tick and string interpolation
+let fullName = firstName + lastName // traditional 
+console.log('Name' + firstName)
+//back tick 
+fullName = `${firstName} ${lastName}`
+console.log(`Full Name ${fullName}`) // string interpoltion
+
+//multi line strings
+let doc = `
+   <html>
+      <head>
+          <title></title>
+      </head>
+    <body>
+    </body>
+ </html>
+`
+console.log(doc)
+
+Numbers:
+ only type called number 
+ 64 bit aka double.
+
+//numbers
+let a = 10
+let b = 20
+let c = a + b 
+console.log(`c ${c}`)
+
+Booleans:
+ true or false
+
+//true or false 
+
+let isValid = true
+let isEnabled = false
+console.log(`Valid ${isValid} Enabled ${isEnabled}`)
+
+
+Undefined:
+ Variable is declared without any valid value.
+
+let price;
+console.log(`Price is ${price}`)
+
+NaN : Not a Number
+
+NaN is number only which represents "error".
+If you do any numerical computation, if computation is failed you will get NaN.
+NaN is kind of "error".
+if you get NaN you have to fix because is bug
+
+NaN Use case:
+if you do computation against undefined values, you get NaN.
+
+let price;
+let qty = 100;
+let totalPrice = price * qty; //undefined * 100
+console.log(`Total Price is ${totalPrice}`)
+
+
+Infinity:
+  Div/0
+//infnity
+let price = 100;
+let avgPrice = price / 0
+console.log(`Avg Price ${avgPrice}`)
+
+..................................................................................
+			Advanced Boolean
+..................................................................................
+What can be true or false?
+
+decision making : if..else ,ternary operator
+
+in JavaScript is every thing is true except the following values 
+
+Falsy values
+
+ * 
+ *  1.boolean false
+ *  2.Empty string "" ,''
+ *  3.0
+ *  4.undefined
+ *  5.NaN
+ *  6.null
+ */
+
+//advanced booleans 
+
+let message = 'Hello'
+
+if (message) {
+    console.log(message)
+} else {
+    console.log('wrong')
+}
+message = ''
+if (message) {
+    console.log(message)
+} else {
+    console.log('wrong')
+}
+let myvar;
+if (myvar) {
+    console.log(`MyVar is ${myvar}`)
+} else {
+    console.log(`MyVar is ${myvar}`)
+}
+myvar = 0
+if (myvar) {
+    console.log(`MyVar is ${myvar}`)
+} else {
+    console.log(`MyVar is ${myvar}`)
+}
+myvar = false
+if (myvar) {
+    console.log(`MyVar is ${myvar}`)
+} else {
+    console.log(`MyVar is ${myvar}`)
+}
+....................................................................................
+				Operator -Equal
+.....................................................................................
+
+== ->Double equal
+=== ->Triple equal
+!=
+!==
+
+let a = 10;
+let b = 10;
+
+if (a == b) {
+    console.log('a and b are equal')
+} else {
+    console.log('a and b are not equal')
+}
+
+let x = 10;
+let y = "10"
+
+if (x == y) {
+    console.log('x and y are equal')
+} else {
+    console.log('x and y are not equal')
+}
+
+
+if (x === y) {
+    console.log('x and y are equal')
+} else {
+    console.log('x and y are not equal')
+}
+**********************************************************************************************************************************************************
+
+
+
+

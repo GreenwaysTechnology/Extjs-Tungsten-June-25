@@ -1,0 +1,129 @@
+											Ext.js
+*************************************************************************************************************************************************************
+What is Ext js?
+ Ext JS is a java script framework for building rich, interactive, cross browser web apps (DOM Applications)
+ It is developed and maintained by the Company called Sencha
+ Sencha Ext.js
+
+History of Ext js:
+  It was originally launched in 2006 as an extension to the YUI lib, later Ext JS evolved into a robust UI framework for building enterprise grade, data intensive web apps with a desktop like user experience
+
+Ext JS versions History:
+........................................
+Ext JS - 1.X - 2006-2007
+Ext JS - 2.X - 2007-2008
+Ext JS - 3.X - 2009-2010
+Ext JS - 4.X - 2011-2013
+Ext JS - 5.X - 2014-2015
+Ext JS - 6.X - 2015-2018
+Ext JS - 7.X - 2019-Till date
+
+Design patterns and Principles in Ext JS
+
+1. Object oriented Programming principles
+     Ext  simulates oo principles
+2.MVC - Model View Controller
+3.MVVM- Model View View Model
+4.Observer Design pattern
+5.Single Ton Pattern
+6.Factory Pattern
+7.Template Pattern
+8.Depency injection (DI)
+9.Command Pattern
+**********************************************************************************************************************************************************
+										Modularity
+********************************************************************************************************************************************************
+When js created there was modularity like java, c++,c , c#.
+JS follows file based modularity.
+
+G:\Tungsten>mkdir modular-app
+
+G:\Tungsten>cd modular-app
+
+G:\Tungsten\modular-app>mkdir src
+
+G:\Tungsten\modular-app>code .
+
+src/greet.js
+function sayGreet(){
+    console.log('greet')
+}
+src/app.js
+
+
+function main(){
+    console.log('main')
+    sayGreet()
+}
+main()
+
+index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script src="src/app.js"></script>
+</body>
+</html>
+
+The out put:
+app.js:5 Uncaught ReferenceError: sayGreet is not defined
+    at main (app.js:5:5)
+    at app.js:7:1
+
+Why we get this reference error
+
+Js engine not able to find the sayGreet.
+
+solution:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script src="src/greet.js"></script>
+    <script src="src/app.js"></script>
+</body>
+</html>
+
+Here we have to refer the files inside script tag
+
+What if i build the big application, each file references other files, then can you include the scripts inside html
+
+Solution:
+ Java script who introduced design patterns to write modular code.
+
+1.Namespace design pattern -2000
+2.AMD
+3.CJS- Common JS
+4.ES 6 Module pattern
+5.System 
+6.UMD
+
+In Modern days, we use two design patterns in coding
+
+1.CJS 2.ES 6 module pattern
+
+What about EXT JS?
+     Namespace Design pattern.
+
+Ext JS who have define the pattern implementation already, just we are going to use that pattern implementation only.
+
+
+
+
+
+
+
+
+
+
+
+

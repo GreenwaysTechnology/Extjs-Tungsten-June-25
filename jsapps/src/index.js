@@ -1,32 +1,18 @@
 
-function jsonDetails() {
-    var config = [
-        {
-            itemId: 'myText', label: 'Enter Name', xtype: 'textBox', listners: {
-                handler: function () {
-                    console.log('typing...')
-                }
-            }
-        },
-        {
-            itemId: 'myButton', label: 'Click', xtype: 'button', listners: {
-                handler: function () {
-                    console.log('Clicked')
-                }
-            }
-        }
-    ]
-    //array to string(json)
-    var configJson = JSON.stringify(config)
-    console.log(configJson)
-
-    //json(string ) to object
-    var configJsonObj= JSON.parse(configJson)
-    console.log(configJsonObj)
+function createElement() {
+    //create heading element (object)
+    var heading = document.createElement('h1')
+    //properties
+    heading.innerHTML = 'Welcome to Ext.js'
+    console.log(heading)
+    //get existing tree
+    var rootElement = document.getElementById('root')
+    console.log(rootElement)
+    rootElement.appendChild(heading)
 }
 
 
 function main() {
-    jsonDetails()
+    createElement()
 }
 main()

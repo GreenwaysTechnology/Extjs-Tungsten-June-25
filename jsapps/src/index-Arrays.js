@@ -1,6 +1,14 @@
+//array
 
-function jsonDetails() {
-    var config = [
+function printPrimitiveArray() {
+    var courses = ['Ext.js', 'Js', 'C#', 'C++']
+    //iteration
+    courses.forEach(function (item) {
+        console.log(item)
+    })
+}
+function printObjectArray() {
+    return [
         {
             itemId: 'myText', label: 'Enter Name', xtype: 'textBox', listners: {
                 handler: function () {
@@ -14,19 +22,16 @@ function jsonDetails() {
                     console.log('Clicked')
                 }
             }
-        }
+        },
+        
     ]
-    //array to string(json)
-    var configJson = JSON.stringify(config)
-    console.log(configJson)
-
-    //json(string ) to object
-    var configJsonObj= JSON.parse(configJson)
-    console.log(configJsonObj)
 }
 
-
 function main() {
-    jsonDetails()
+    printPrimitiveArray()
+    var configs = printObjectArray()
+    configs.forEach(function (config) {
+        console.log(config.itemId, config.xtype,config.label,config.listners)
+    })
 }
 main()

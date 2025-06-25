@@ -185,8 +185,53 @@ var product = EXT.define('MyApp.app.Product',{
 })
 console.log(product)
 ***********************************************************************************************************************************************************
+												Setup Ext js
+**********************************************************************************************************************************************************
 
+There are two ways to setup Ext.js Project
 
+1.Using CDN
+     This is easiest way to setup the project. Not recommended for production
+2.Using Command line tools
+    Sencha CMD
+
+Sencha Products not open source or free, you have to get license
+
+Note: 
+CDN support is not available for 7.x
+
+CDN setup:
+
+:\Tungsten>mkdir  ext-cdn
+
+:\Tungsten\ext-cdn>mkdir src
+
+G:\Tungsten\ext-cdn>code .
+
+G:\Tungsten\ext-cdn>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- Link any framework or lib -->
+    <link rel="stylesheet" type="text/css"
+        href="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/classic/theme-crisp/resources/theme-crisp-all.css" />
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/ext-all.js"></script>
+</head>
+<body>
+
+</body>
+
+</html>
+...........................................................................................................................................................................................................................................
+											Ext Core concepts
+.........................................................................................................................................................................................................................................
+
+1.Ext object oriented programming and implementation
 
 
 

@@ -1,0 +1,363 @@
+								Ext Object Oriented Programming concepts and implementation
+*************************************************************************************************************************************************************
+
+Ext js is framework which is exposed as "Ext" namespace
+.
+What is a Namespace in Ext JS?
+
+A namespace in Ext JS is just a way to organize your classes in a hierarchical, unique structure — using dot-separated names like 
+MyApp.view.Main or MyApp.model.Person.
+
+The Ext namespace is entry point in Ext.js applications.
+
+How to begin ext code?
+function App() {
+    //print ext version
+  console.log(Ext.versions.ext.version)
+}
+App()
+Ext.versions.ext.version
+ |
+Namespace
+All ext code begins with "Ext" Namespace.
+.........................................................................................................................................................................................................................................
+								
+OO Concepts:
+
+1. how to declare classes
+2.How to create objects/instances
+3.How to add properties and methods into class
+4.Static properties
+5.Inheritance
+6.Mixin
+
+Declare Classes 
+
+Ext.define('className',{
+  //class instance variables and methods,constructors
+})
+//Define class
+var HelloWorld = Ext.define('HelloWorld', {
+    
+})
+
+Create Object/instance
+
+function App() {
+    var h = new HelloWorld()
+    console.log(h)
+}
+App()
+
+Object creation:
+  There are two ways to create Object for a class
+
+1.JS style
+   var h = new HelloWorld()
+    console.log(h)
+2.Ext style
+
+   //Ext way
+   var h1= Ext.create('HelloWorld')
+   console.log(h1)
+******************************************************************************************************************************************************
+									Properties 
+.******************************************************************************************************************************************************
+📌 What are Properties in Ext JS?
+
+In an Ext JS class, you can define properties in 3 main ways:
+
+Instance Properties => Belong to each object instance
+Config Properties =>    Declared in config block → auto getter/setter
+Static Properties =>     Shared by all instances (like a class constant)
+
+
+instance Properties:
+
+Syntax:
+Ext.define('MyApp.Car', {
+    color: 'red', // Instance property
+});
+var myCar = Ext.create('MyApp.Car');
+console.log(myCar.color); // red
+
+eg:
+//instance members
+Ext.define('Person', {
+    id: 1,
+    name: 'Subrmanian Murugan',
+    email: 'sasubramanan_md@hotmail.com',
+    status: true,
+    address: {
+        city: 'Coimbatore'
+    },
+    skills: [
+        'java', 'javascript'
+    ]
+
+})
+function App() {
+    var person = Ext.create('Person')
+    console.log(`Id : ${person.id}`)
+    console.log(`Name : ${person.name}`)
+    console.log(`status : ${person.status}`)
+    console.log(`Id : ${person.address.city}`)
+    console.log(`Skills : ${person.skills}`)
+}
+App()
+........................................................................................................................................................................................................................................
+										 instance variable initialization
+
+1.inside class with hard coded values
+Ext.define('Person', {
+    id: 1,
+    name: 'Subrmanian Murugan',
+    email: 'sasubramanan_md@hotmail.com',
+    status: true,
+    address: {
+        city: 'Coimbatore'
+    },
+    skills: [
+        'java', 'javascript'
+    ]
+
+})
+2.After object creation, you can reinitialize the values
+//instance members
+Ext.define('Person', {
+    id: 1,
+    name: 'Subrmanian Murugan',
+    email: 'sasubramanan_md@hotmail.com',
+    status: true,
+    address: {
+        city: 'Coimbatore'
+    },
+    skills: [
+        'java', 'javascript'
+    ]
+
+})
+function App() {
+    var person = Ext.create('Person')
+    console.log(`Id : ${person.id}`)
+    console.log(`Name : ${person.name}`)
+    console.log(`status : ${person.status}`)
+    console.log(`Id : ${person.address.city}`)
+    console.log(`Skills : ${person.skills}`)
+
+    //reinitalize with different data
+    person.id = 2
+    person.name = 'Murugan P'
+    person.status = true
+    person.address = {
+        city: 'Chennai'
+    }
+    person.skills = [
+        "Data Science", "ML"
+    ]
+
+    console.log(`Id : ${person.id}`)
+    console.log(`Name : ${person.name}`)
+    console.log(`status : ${person.status}`)
+    console.log(`Id : ${person.address.city}`)
+    console.log(`Skills : ${person.skills}`)
+
+}
+App()
+*********************************************************************************************************************************************************
+										Constructors 
+********************************************************************************************************************************************************
+Constructors are special function which gets called during object creation
+
+Syntax:
+Ext.define('className',{
+   instanceVariable:defaultvalue,
+   constructor:function(a1,a2,a3){
+	this.instanceVariable=a1
+   }
+})
+
+//instance members
+Ext.define('Person', {
+    id: 0,
+    name: '',
+    email: '',
+    status: false,
+    address: {
+        city: ''
+    },
+    skills: [],
+    constructor: function (id, name, email, status, address, skills) {
+        this.id = id
+        this.name = name
+        this.email = email
+        this.status = status
+        this.address = address
+        this.skills = skills
+    }
+
+})
+function App() {
+    var person = Ext.create('Person', 1, 'Subramanian', 'subu@gmail.com',
+        true, { city: 'Coimbatore' }, ['java', 'js'])
+    console.log(`Id : ${person.id}`)
+    console.log(`Name : ${person.name}`)
+    console.log(`status : ${person.status}`)
+    console.log(`Id : ${person.address.city}`)
+    console.log(`Skills : ${person.skills}`)
+}
+App()
+*********************************************************************************************************************************************************
+									  Methods Declaration
+*****************************************************************************************************************************************************
+//instance members
+Ext.define('Greeting', {
+    message: ''',
+    constructor: function (message='Welcome') {
+        this.message = message
+    },
+    sayHello: function (name='John') {
+        return `${this.message} ${name}`
+    }
+})
+function App() {
+    var greet = Ext.create('Greeting', 'Hello')
+    console.log(greet.sayHello('Subramanian'))
+}
+App()
+************************************************************************************************************************************************************
+											Config Properties
+**********************************************************************************************************************************************************
+Configuration:
+   There is also a dedicated config property that gets processed by the powerful Ext.Class pre-processors before the class is created.
+
+1.Configurations are completely encapsulated from other class members
+2.Getter and setter methods for every config property are automatically generated into the class prototype during class creation 
+ if methods are not already defined.
+		
+ config block automatically creates:
+
+1.Getter: getBrand()
+2.Setter: setBrand()
+3.Apply method (optional: applyBrand for custom processing)
+4.Update method (optional: updateBrand for reacting to changes)
+
+
+✅ initConfig(config) sets initial values.
+✅ You interact with configs via generated getters/setters — not direct property access.
+
+Use case: Declare default properties and initialize and read
+//config
+Ext.define("Person", {
+    config: {
+        id: 0,
+        name: 'Subramanian',
+        email: 'subu@gmail.com',
+        status: false,
+        address: {
+            city: 'Coimbatore'
+        },
+        skills: ['Java', 'JS']
+    },
+    constructor: function (config) {
+        //set inital value
+        this.initConfig(config)
+    }
+})
+
+function App() {
+    var person = Ext.create('Person')
+    console.log(person)
+    console.log(`Id : ${person.getId()}`)
+    console.log(`Name : ${person.getName()}`)
+    console.log(`status : ${person.getStatus()}`)
+    console.log(`Id : ${person.getAddress().city}`)
+    console.log(`Skills : ${person.getSkills()}`)
+
+}
+App()
+********************************************************************************************************************************************************
+								   Setting Config Properties
+
+1.via setter methods , after object creation
+2.via constructor
+
+
+Eg: via setters
+//config
+Ext.define("Person", {
+    config: {
+        id: 0,
+        name: 'Subramanian',
+        email: 'subu@gmail.com',
+        status: false,
+        address: {
+            city: 'Coimbatore'
+        },
+        skills: ['Java', 'JS']
+    },
+    constructor: function (config) {
+        //set inital value
+        this.initConfig(config)
+    }
+})
+
+function App() {
+    var person = Ext.create('Person')
+    console.log(person)
+    console.log(`Id : ${person.getId()}`)
+    console.log(`Name : ${person.getName()}`)
+    console.log(`status : ${person.getStatus()}`)
+    console.log(`Id : ${person.getAddress().city}`)
+    console.log(`Skills : ${person.getSkills()}`)
+
+    //new properties
+    person.setId(10)
+    person.setName('Ram')
+    console.log(`Id : ${person.getId()}`)
+    console.log(`Name : ${person.getName()}`)
+
+}
+App()
+
+
+Constructors:
+....................
+//config
+Ext.define("Person", {
+    config: {
+        id: 0,
+        name: '',
+        email: '',
+        status: false,
+        address: {
+            city: ''
+        },
+        skills: []
+    },
+    constructor: function (config) {
+        //set inital value
+        this.initConfig(config)
+    }
+})
+
+function App() {
+    var person = Ext.create('Person', {
+        id: 1,
+        name: 'Subramanian M',
+        status: true,
+        address: {
+            city: 'Coimbatore'
+        },
+        skills: ['js', 'java']
+    })
+    console.log(person)
+    console.log(`Id : ${person.getId()}`)
+    console.log(`Name : ${person.getName()}`)
+    console.log(`status : ${person.getStatus()}`)
+    console.log(`Id : ${person.getAddress().city}`)
+    console.log(`Skills : ${person.getSkills()}`)
+
+
+}
+App()

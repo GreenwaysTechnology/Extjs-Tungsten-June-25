@@ -87,31 +87,31 @@ body  -Node
 ..............................................................................................
 Static web pages: htmls are displayed into browser.
 ..............................................................................................
-In 1996,Netscap communication,Started an RND project called "How to manipulate the tree"
+In 1996,Netscap communication, started an RND project called "How to manipulate the tree"
 
-Tree is written in c language,then we need another c program to communicate.
+Tree is written in c language, then we need another c program to communicate.
 
 But NETSCAP decided not to use C pl.
 
-Netscap wanted to put java like implementation inside browser to manipulate "Tree".
+Netscape wanted to put java like implementation inside browser to manipulate "Tree".
 
-that is birth of javascript.
+that is birth of JavaScript.
 
-How to access nodes from javascript engine?
+How to access nodes from JavaScript engine?
   
 One spec was published ,As per that spec
  "Document Object Model"
     -How to represent document(elements/nodes) in object oriented way.->DOM
 
- "Documents can be reprsented as Objects" : Object oriented Document Programming.
+ "Documents can be represented as Objects" : Object oriented Document Programming.
 
 ............................................................................................
 
 How dom works?
 
-index.html           Browser runtime(C program)         Javascript Engine
-<h1>Hello</h1>       h1-Node                           h1- Object
-			Hello-Node			 Hello Object Property
+index.html           Browser runtime(C program)         JavaScript Engine
+<h1>Hello</h1>       h1-Node                                     h1- Object
+			Hello-Node			                     Hello Object Property
 
 
 
@@ -120,7 +120,7 @@ index.html           Browser runtime(C program)         Javascript Engine
 	       Every Html ELEMENT Inside JavaScript engine is "Object"
 
 
-javascript developer ---->uses api --->to communicate Object---->js engine---->browser engine.	*************************************************************************************
+JavaScript developer ---->uses api --->to communicate Object---->js engine---->browser engine.	*************************************************************************************
 Who and when "H1" object is created?
 
 if you want to create object?
@@ -145,7 +145,7 @@ Implicit object reference variable which points HTMLDocument OBject.
 What is our objective here? DOM Programming?
 Enter into DOM programming:
 
-1.write dom programming using javascript language.
+1.write dom programming using JavaScript language.
 
 <body>
   |

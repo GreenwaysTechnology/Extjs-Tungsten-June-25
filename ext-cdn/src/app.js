@@ -1,38 +1,24 @@
-//config
-Ext.define("Person", {
-    config: {
-        id: 0,
-        name: '',
-        email: '',
-        status: false,
-        address: {
-            city: ''
-        },
-        skills: []
+//instance members
+Ext.define('MyApp.model.Person', {
+    id: 1,
+    name: 'Subrmanian Murugan',
+    email: 'sasubramanan_md@hotmail.com',
+    status: true,
+    address: {
+        city: 'Coimbatore'
     },
-    constructor: function (config) {
-        //set inital value
-        this.initConfig(config)
-    }
+    skills: [
+        'java', 'javascript'
+    ]
+
 })
-
 function App() {
-    var person = Ext.create('Person', {
-        id: 1,
-        name: 'Subramanian M',
-        status: true,
-        address: {
-            city: 'Coimbatore'
-        },
-        skills: ['js', 'java']
-    })
-    console.log(person)
-    console.log(`Id : ${person.getId()}`)
-    console.log(`Name : ${person.getName()}`)
-    console.log(`status : ${person.getStatus()}`)
-    console.log(`Id : ${person.getAddress().city}`)
-    console.log(`Skills : ${person.getSkills()}`)
-
-
+    var person = Ext.create('MyApp.model.Person')
+    console.log(`Id : ${person.id}`)
+    console.log(`Name : ${person.name}`)
+    console.log(`status : ${person.status}`)
+    console.log(`Id : ${person.address.city}`)
+    console.log(`Skills : ${person.skills}`)
 }
 App()
+

@@ -5,7 +5,7 @@ Ext js is framework which is exposed as "Ext" namespace
 .
 What is a Namespace in Ext JS?
 
-A namespace in Ext JS is just a way to organize your classes in a hierarchical, unique structure — using dot-separated names like 
+   A namespace in Ext JS is just a way to organize your classes in a hierarchical, unique structure — using dot-separated names like 
 MyApp.view.Main or MyApp.model.Person.
 
 The Ext namespace is entry point in Ext.js applications.
@@ -357,7 +357,691 @@ function App() {
     console.log(`status : ${person.getStatus()}`)
     console.log(`Id : ${person.getAddress().city}`)
     console.log(`Skills : ${person.getSkills()}`)
+}
+App()
+*********************************************************************************************************************************************************
+										apply and update hooks
+....................................................................................................................................................................................................................................
+✅ What are apply and update hooks?
+	When you define a config property in Ext JS, you can add special methods to control how the value is set and what happens after it’s set:
 
+               Hook      				 |                  Purpose                                               
+
+apply -->		 Runs **before** setting the new value. Used to validate/modify the input.                           
+update  -->      Runs **after** the value has been set. Used to react to the change (e.g., update DOM, fire events). 
+
+
+Rule of thumb
+1.apply modifies input.
+2.update reacts to change.
+
+
+syntax:
+ applyPropName:function(value){
+	
+ }
+ updatePropName:function(newValue,oldValue){
+
+ }
+
+apply:
+//config
+Ext.define("Person", {
+    config: {
+        id: 0,
+        name: '',
+        age: 18
+    },
+    constructor: function (config) {
+        //set inital value
+        this.initConfig(config)
+    },
+    //hooks 
+    applyAge: function (value) {
+        if (value < 0) {
+            console.log('Age Cant be Negative setting to default Value(18)')
+            return 18
+        }
+        return value
+    }
+})
+
+function App() {
+    var person = Ext.create('Person', {
+        id: 1,
+        name: 'Subramanian M',
+        // age: -1
+        age: 25
+    })
+    console.log(`Id : ${person.getId()}`)
+    console.log(`Name : ${person.getName()}`)
+    console.log(`Age : ${person.getAge()}`)
 
 }
 App()
+
+update:
+//config
+Ext.define("Person", {
+    config: {
+        id: 0,
+        name: '',
+        age: 18
+    },
+    constructor: function (config) {
+        //set inital value
+        this.initConfig(config)
+    },
+    //hooks 
+    applyAge: function (value) {
+        if (value < 0) {
+            console.log('Age Cant be Negative setting to default Value(18)')
+            return 18
+        }
+        return value
+    },
+    updateAge: function (newAge, oldAge) {
+        //you can do something with old and new values
+        console.log(`Age Changed from ${oldAge} to ${newAge}`)
+    }
+})
+
+function App() {
+    var person = Ext.create('Person', {
+        id: 1,
+        name: 'Subramanian M',
+        // age: -1
+        age: 18
+    })
+    person.setAge(20)
+    //set Age:
+    console.log(`Id : ${person.getId()}`)
+    console.log(`Name : ${person.getName()}`)
+    console.log(`Age : ${person.getAge()}`)
+
+}
+App()
+***********************************************************************************************************************************************************
+											Inheritance
+***********************************************************************************************************************************************************
+JavaScript inheritance is completely different from c++ based languages
+In JavaScript  inheritance is object based not class based -  Object inherits other objects
+In JavaScript we have Prototype Object which is always direct parent of any object except "Object"
+
+Ext js And Inheritance:
+
+   In Ext JS, inheritance is done using the extend property inside Ext.define. 
+   It follows classical inheritance (like Java/C#), not prototypical (like vanilla JavaScript),but internally Prototypical
+
+Simple Inheritance:
+//base class /parent class
+Ext.define('Animal', {
+    config: {
+        name: ''
+    },
+    constructor: function (config) {
+        this.initConfig(config)
+    },
+    speak: function () {
+        return `${this.getName()} makes a noise`
+    }
+
+})
+//child class /dervied class
+Ext.define('Dog', {
+    extend: 'Animal'
+})
+
+
+function App() {
+    //create instance of Child class
+    var dog = Ext.create('Dog', {
+        name: 'Jacky'
+    })
+    console.log(dog.getName())
+    console.log(dog.speak())
+}
+App()
+
+How It Works 
+
+1.extend: Specifies the superclass.
+2.config: Automatically gives you getName() and setName() methods.
+3.constructor: Initializes config using initConfig(config).
+
+How to override method?
+//base class /parent class
+Ext.define('Animal', {
+    config: {
+        name: ''
+    },
+    constructor: function (config) {
+        this.initConfig(config)
+    },
+    speak: function () {
+        return `${this.getName()} makes a noise`
+    }
+
+})
+//child class /dervied class
+Ext.define('Dog', {
+    extend: 'Animal',
+    speak: function () {
+        return `${this.getName()} says woof!`
+    }
+})
+
+
+function App() {
+    //create instance of Child class
+    var dog = Ext.create('Dog', {
+        name: 'Jacky'
+    })
+    console.log(dog.getName())
+    console.log(dog.speak())
+}
+App()
+***********************************************************************************************************************************************************
+ 										How to call super class Methods from derived class
+*********************************************************************************************************************************************************
+Ext provides a built in function called "callParent"
+
+//base class /parent class
+Ext.define('Animal', {
+    config: {
+        name: ''
+    },
+    constructor: function (config) {
+        this.initConfig(config)
+    },
+    speak: function () {
+        return `${this.getName()} makes a noise`
+    }
+
+})
+//child class /dervied class
+Ext.define('Dog', {
+    extend: 'Animal',
+    speak: function () {
+        //calling parent class method
+        var parentResult = this.callParent()
+        console.log(`From Parent ${parentResult}`)
+        return `${this.getName()} says woof!`
+    }
+})
+
+
+function App() {
+    //create instance of Child class
+    var dog = Ext.create('Dog', {
+        name: 'Jacky'
+    })
+    console.log(dog.speak())
+}
+App()
+**********************************************************************************************************************************************************
+***********************************************************************************************************************************************************
+								Multi Level Inheritance
+.....................................................................................................................................................................................
+	In Ext JS, multiple-level (multi-tier) inheritance is fully supported using the extend keyword. Each class can extend another, forming a chain of inheritance.
+
+//base class /parent class
+Ext.define('Animal', {
+    config: {
+        name: ''
+    },
+    constructor: function (config) {
+        this.initConfig(config)
+    },
+    speak: function () {
+        return `${this.getName()} makes a noise`
+    }
+
+})
+Ext.define('Mammal', {
+    extend: 'Animal',
+    //methods 
+    speak: function () {
+        var base = this.callParent()
+        console.log('From Mammal :', base)
+        return this.getName() + ' is mammal and  makes a sound'
+    }
+})
+//child class /dervied class
+Ext.define('Dog', {
+    extend: 'Mammal',
+    speak: function () {
+        //calling parent class method
+        var parentResult = this.callParent()
+        console.log(`From Parent ${parentResult}`)
+        return `${this.getName()} says woof!`
+    }
+})
+
+
+function App() {
+    //create instance of Child class
+    var dog = Ext.create('Dog', {
+        name: 'Jacky'
+    })
+    console.log(dog.speak())
+}
+App()
+***********************************************************************************************************************************************************
+							Passing Parameters to parent Class method
+.....................................................................................................................................................................................................................................
+this.callParent(arguments)  in Ext JS, which allows a subclass method to call its parent class method — just like super() in other OOP languages.
+
+Use Case: this.callParent(arguments) in Multi-Level Inheritance
+
+arguments:
+  It is keyword in java script.
+ which indicates variable args
+
+eg: 
+
+  function doStuff(a,b){
+
+ }
+ doStuff(10)
+ doStuff(10,20)
+
+incase there is dynamic args meaning that i dont know how many args i pass. then how to define args variable
+
+  function doStuff(arguments){
+
+ }
+ doStuff(10)
+ doStuff(10,20)
+ doStuff(10,20,30,212,89)
+
+//base class
+Ext.define('Calculator', {
+    multiply: function (a, b) {
+        console.log(`a ${a} b ${b}`)
+        return a * b;
+    }
+});
+Ext.define('SmartCalculator', {
+    extend: 'Calculator',
+    multiply: function (a, b) {
+        console.log('Multiplying:', a, '*', b);
+        var result = this.callParent(arguments);
+        console.log('Result From Parent:', result);
+        return result * 2;
+    }
+});
+
+function App() {
+    var calc = Ext.create('SmartCalculator');
+    var output = calc.multiply(3, 4);
+    console.log('Output', '3 × 4 = ' + output);
+
+}
+App()
+Why Use arguments?
+
+ this.callParent(arguments);
+
+1.You don’t need to manually list a, b or any parameters.
+2.Automatically passes everything received in the current method.
+
+Useful when:
+1.You override methods but don’t want to break inheritance.
+2.You don’t know the number or order of arguments (like in base class APIs or event handlers)
+***********************************************************************************************************************************************************
+					    Modify Arguments Before Calling callParent(arguments)
+***********************************************************************************************************************************************************
+Key Idea
+1.arguments is an array-like object — you can convert or replace it.
+2.this.callParent(modifiedArgs) allows you to change how the superclass receives the values.
+3.This is especially useful when wrapping or extending framework-level methods like initComponent, apply, event handlers, etc.
+
+Use Case:
+Let’s say we have a base class that logs messages with logMessage(message, level), and we want a subclass to:
+Force the level to 'info' if none is given.
+
+Ext.define('Logger', {
+    logMessage: function (message, level) {
+        console.log(`[ ${level.toUpperCase()} ] ${message}`)
+    }
+})
+//Child class: SmartLogger that modifies args
+Ext.define('SmartLogger', {
+    extend: 'Logger',
+    logMessage: function (message, level) {
+        if (!level) {
+            level = 'info'
+        }
+        //modify the args
+        var args = [message, level]
+        this.callParent(args)
+
+    }
+})
+function App() {
+    var logger = Ext.create('SmartLogger')
+    logger.logMessage('System Started')
+    logger.logMessage('Disk Full','warning')
+    
+}
+App()
+************************************************************************************************************************************************************
+									  Cloning the object Properties
+								                 (Ext.apply method)
+************************************************************************************************************************************************************
+In javascript we have many ways to copy object properties into another object or merge properties into existing object.
+Object.assign() - this is js api
+
+Ext provides an api to do this job.
+
+Ext.apply method									
+Ext.apply() is a utility method in Ext JS used to copy properties from one object to another. It’s like Object.assign() in modern JavaScript but used more widely in Ext JS to configure or extend objects.
+
+
+Syntax:
+
+Ext.apply(target, source);
+
+target: The object to receive new properties.
+
+source: The object containing properties to copy.
+
+
+function App() {
+    var person = {
+        name: 'John'
+    };
+    console.log('Before copy', person)
+    Ext.apply(person, {
+        age: 30,
+        occupation: 'Engineer'
+    });
+    console.log('After Copy',person);
+}
+App()
+
+Ext.applyIf() (Optional Alternative):
+........................................................
+
+function App() {
+    var person = {
+        name: 'John'
+    };
+    console.log('Before copy', person)
+    Ext.applyIf(person, {
+        name: 'Subramanian',
+        age: 30,
+        occupation: 'Engineer'
+    });
+    console.log('After Copy', person);
+}
+App()
+
+| Use Case                               | Why Use It                          |
+| -------------------------------------- | ----------------------------------- |
+| Setting default configs in a component | Merge defaults into `this`          |
+| Extending plain JS objects             | Quickly add/merge properties        |
+| During class instantiation             | Configure based on passed-in values |
+************************************************************************************************************************************************************
+								       	Mixin
+**********************************************************************************************************************************************************
+In Ext JS, a mixin allows you to include reusable logic (methods, configs, etc.) into multiple classes without extending them. Think of mixins like traits or interfaces with implementation — enabling multiple inheritance-like behavior.
+
+Why Use Mixins?
+1.Code reuse without inheritance
+2.Share behavior across unrelated classes
+3.Avoid deep or rigid class hierarchies
+
+Mixin is just class only, when you attach with other classes, you have to use "mixin" configuration.
+
+//parent
+Ext.define('MyLogger', {
+    log: function (msg) {
+        console.log('[LOG]: ' + msg);
+    }
+});
+
+Ext.define('Person', {
+    mixins: {
+        logger: 'MyLogger'
+    },
+    name: 'Subramanian Murugan',
+    constructor: function (config) {
+        Ext.apply(this, config)
+        this.log('Person Created  ', this.name)
+
+    },
+    sayHello: function () {
+        this.log('Hello,MyName is '+ this.name)
+    }
+})
+
+function App() {
+    var person = Ext.create('Person', {
+        age: 18,
+        name: 'Subramanian M',
+    })
+    person.sayHello()
+}
+App()
+*****************************************************************************************************************************************************
+									Multiple Mixins
+.........................................................................................................................................................................................
+
+Ext.define('Greeter', {
+    greet: function () {
+        console.log('Hello from mixin!');
+    }
+});
+Ext.define('Validator', {
+    isValidAge: function (age) {
+        return age > 18 && age < 60;
+    }
+});
+Ext.define('Employee', {
+    mixins: {
+        greeter: 'Greeter',
+        validator: 'Validator'
+    },
+    constructor: function (config) {
+        Ext.apply(this, config);
+        //here age is not declared how it would be part of Employee(this.age)
+        //because of Ext.apply(this,config) now config is part of Employee
+        if (this.isValidAge(this.age)) {
+            this.greet();
+        } else {
+            console.log('Sorry you have supplied invalid input')
+        }
+    }
+});
+function App() {
+    var emp = Ext.create('Employee', {
+        name: 'Dhivya',
+        age: 10
+    });
+    // Now you can call any methods or access properties
+    console.log(emp.name, emp.age);     // Outputs: Dhivya
+    // emp.greet();               // Outputs: Hello from mixin!
+
+}
+App()
+************************************************************************************************************************************************************
+										Overriding Mixins Method
+******************************************************************************************************************************************************
+Ext.define('Logger', {
+    log: function (msg) {
+        console.log('[LOG]: ' + msg);
+    }
+});
+Ext.define('CustomLogger', {
+    mixins: {
+        logger: 'Logger'
+    },
+    // This overrides the mixin's log() method
+    log: function (msg) {
+        console.log('[CUSTOM LOG]: ' + msg);
+    },
+});
+function App(){
+  var customLogger =Ext.create('CustomLogger')
+  customLogger.log('Hello')
+}
+App()
+.......................................................................................................................................................................................................................................
+							Methods conflict and Mixins
+.......................................................................................................................................................................................................................................
+
+How to handle multiple mixins with conflicting method names, and how to override or explicitly call a specific mixin's version.
+Scenario: Two mixins with the same method name — log()
+
+Ext.define('ConsoleLogger', {
+    log: function (msg) {
+        console.log('[Console] ' + msg);
+    }
+});
+Ext.define('AlertLogger', {
+    log: function (msg) {
+        console.log('[Alert] ' + msg);
+    }
+});
+Ext.define('LoggerUser', {
+    mixins: {
+        consoleLogger: 'ConsoleLogger',
+        alertLogger: 'AlertLogger'
+    },
+    log: function (msg) {
+        console.log('[Combined]' + msg)
+        //call both mixins explicitly
+        this.mixins.consoleLogger.log.call(this, msg + '(from Console Logger)')
+        this.mixins.alertLogger.log.call(this, msg + '(from Alert Logger)')
+    },
+    run: function(){
+        this.log('Testing Multiple mixins')
+    }
+})
+function App() {
+    var logger = Ext.create('LoggerUser');
+    logger.run();
+}
+App()
+
+| Behavior                       | 			What to Do                                                    
+| ------------------------------ | ------------------------------------------------------------- |
+| Mixins have conflicting method | Only one wins by default (last one loaded, or class override) 
+| Want to call both explicitly   | Use `this.mixins.mixinName.method.call(this, args)`           
+| Want to override both          | Define your own method and call mixins manually               
+************************************************************************************************************************************************************						Class inheritance + mixins
+.........................................................................................................................................................................................
+Using class inheritance + mixins together in Ext JS — combining the power of OOP inheritance with reusable behaviors from mixins.
+
+Goal:
+1.Base class with a method
+2.Subclass that inherits it
+3.Mixins that add reusable logic
+4.Subclass can override mixin or inherited method
+Ext.define('LoggerMixin', {
+    log: function (msg) {
+        console.log('[LOG]: ' + msg);
+    }
+});
+Ext.define('Person', {
+    name: '',
+    constructor: function (config) {
+        Ext.apply(this, config);
+        console.log('Person constructor called for ' + this.name);
+    },
+
+    sayHi: function () {
+        console.log('Hi, I am ' + this.name);
+    }
+});
+Ext.define('Employee', {
+    extend: 'Person',
+    mixins: {
+        logger: 'LoggerMixin'
+    },
+    employeeId: '',
+
+    constructor: function (config) {
+        this.callParent([config]); // Call Person's constructor
+        this.log('Employee created: ' + this.name + ', ID: ' + this.employeeId);
+    },
+
+    sayHi: function () {
+        this.callParent(); // Call Person's sayHi
+        this.log('Employee says hi too.');
+    }
+});
+function App() {
+    var emp = Ext.create('Employee',{
+        employeeId: 1,
+        name: 'Subramanian'
+    })
+    emp.sayHi()
+
+}
+App()
+
+***********************************************************************************************************************************************************
+										Coding Standards 
+*********************************************************************************************************************************************************
+class Declaration:
+
+1.class Name must be noun - Employee,Person
+2.Every class Namespaced
+eg:
+   CompanyName.ModuleName.SubModuleName.ClassName
+  or
+   FoderName.subFolder.subFolder.SubFolder.ClassNme
+
+eg:
+   google.invoice.payment.CreditCard
+   MyApp.model.CreditCard
+
+//instance members
+Ext.define('MyApp.model.Person', {
+    id: 1,
+    name: 'Subrmanian Murugan',
+    email: 'sasubramanan_md@hotmail.com',
+    status: true,
+    address: {
+        city: 'Coimbatore'
+    },
+    skills: [
+        'java', 'javascript'
+    ]
+
+})
+function App() {
+    var person = Ext.create('MyApp.model.Person')
+    console.log(`Id : ${person.id}`)
+    console.log(`Name : ${person.name}`)
+    console.log(`status : ${person.status}`)
+    console.log(`Id : ${person.address.city}`)
+    console.log(`Skills : ${person.skills}`)
+}
+App()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

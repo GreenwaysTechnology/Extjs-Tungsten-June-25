@@ -1,5 +1,5 @@
 											Ext.js
-*************************************************************************************************************************************************************
+************************************************************************************************************************************************************
 What is Ext js?
  Ext JS is a java script framework for building rich, interactive, cross browser web apps (DOM Applications)
  It is developed and maintained by the Company called Sencha
@@ -156,8 +156,8 @@ console.log(emp)
 
 //Namespace
 //IIFE - Immediately invoked Function Expression.
-//IIFE functions are get executed automatially
-//IIFE functions are used to encaspulate code - Namespace
+//IIFE functions are get executed automatically
+//IIFE functions are used to encapsulate code - Namespace
 EXT = (function () {
     return {
         //apis

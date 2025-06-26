@@ -1,0 +1,117 @@
+ 								Get Started Ext JS Application Using toolkit
+
+Project:
+ 1.CDN based
+  2.CMD based
+
+Cmd based:
+
+1.trial version
+2.licence version
+
+https://www.sencha.com/
+
+Products:
+1.Ext js 
+     HTML 5, CSS 3 based application
+2.ReExt
+     React based application
+
+3.GxT
+     Java based application
+
+Trial vs  Lic (pro) Enterprise lic
+https://store.sencha.com/?_gl=1%2Anrlhe1%2A_gcl_au%2AODAzOTA5NjQyLjE3NDc4MzAxOTUuMTI1MjExNjgxNi4xNzQ4Njk3MTYzLjE3NDg2OTcxNjM.%2A_ga%2AMTc1NzQzNDE1My4xNzQ3ODMwMTk1%2A_ga_N22XX4DD1R%2AczE3NTA5MjIxMjAkbzIwJGcwJHQxNzUwOTIyMTIwJGo2MCRsMCRoMA..
+
+
+Trail Version:
+........................
+1.Download trail sdk and command line tools
+2.SenchaCmd-7.9.0.35-windows-64bit
+   Install
+
+Testing:
+>sencha
+Sencha Cmd v7.9.0.35
+Sencha Cmd provides several categories of commands and some global switches. In
+most cases, the first step is to generate an application based on a Sencha SDK
+such as Ext JS or Sencha Touch:
+
+    sencha -sdk /path/to/sdk generate app MyApp /path/to/myapp
+
+Sencha Cmd supports Ext JS 4.1.1a and higher and Sencha Touch 2.1 and higher.
+
+To get help on commands use the help command:
+
+    sencha help generate app
+**********************************************************************************************************************************************************
+										 Types of Ext Application
+**********************************************************************************************************************************************************
+1.Browser based Desktop application - Fixed width
+    Desktop browser application - legacy way of creating application
+    Web apps runs in a fixed width devices
+2.Browser based desktop application and Mobile Browser - Fluid width /Response Web Design
+     Creating Responsive web application -based on Screen Width/resolution
+
+Sencha Ext js provides commands to create three types of apps/Projects
+
+1.classic -  fixed width - old way
+2.modern - Fluid width/Response - new way
+3.hybrid  - supports both in a single project
+
+### 🔹 1. Overview
+
+| Feature / Aspect     | **Classic Toolkit**                  | **Modern Toolkit**                      |
+| -------------------- | ------------------------------------ | --------------------------------------- |
+| **Purpose**          | Desktop-first, rich enterprise apps  | Mobile-first, responsive apps           |
+| **Introduced In**    | Ext JS 4.x                           | Ext JS 6.x                              |
+| **Primary Target**   | Desktop browsers                     | Mobile devices & responsive desktop     |
+| **Component System** | Heavier, more feature-rich           | Lightweight, touch-optimized            |
+| **Layout System**    | Advanced (e.g., border, table, etc.) | Simplified (flexbox, responsive layout) |
+| **Data Binding**     | MVVM, 2-way binding                  | MVVM, but lighter and faster            |
+| **Performance**      | Slower on mobile                     | Better on mobile                        |
+| **Touch Support**    | Limited                              | Native touch support                    |
+
+
+### 🔹 2. Project Setup with Sencha Cmd
+
+Sencha Cmd supports **three types** of project setups:
+
+| Type             | Description                                                 |
+| ---------------- | ----------------------------------------------------------- |
+| **Classic-only** | Includes only the Classic toolkit                           |
+| **Modern-only**  | Includes only the Modern toolkit                            |
+| **Universal**    | Includes both Classic and Modern toolkits (shared codebase) |
+
+ 3. Creating Different Project Setups
+Syntax
+
+License Version Syntax:
+
+   sencha  -sdk /path/to/ext generate app [options] name     path
+
+-sdk tells that where is licensed sdk in your machine
+
+Trail Version Syntax
+ sencha generate app -ext   MyApp ./MyClassicApp
+
+-ext options says that download sdk from the sencha server into local project
+
+✅ Classic-only Project:
+
+  sencha generate app -ext -classic MyApp ./MyClassicApp
+
+ -ext => force to download sdk from sencha server and keep inside your local project
+ -classic -> you are creating desktop first application
+ MyApp - Name of the App
+./MyClassApp- FolderName where your app is created
+
+How to run?
+G:\Tungsten\extapps\MyClassicApp>sencha app watch
+
+
+
+
+
+
+

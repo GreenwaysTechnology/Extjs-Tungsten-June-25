@@ -7,7 +7,7 @@ Project:
 Cmd based:
 
 1.trial version
-2.licence version
+2.license  version
 
 https://www.sencha.com/
 
@@ -16,7 +16,6 @@ Products:
      HTML 5, CSS 3 based application
 2.ReExt
      React based application
-
 3.GxT
      Java based application
 
@@ -109,9 +108,77 @@ Trail Version Syntax
 How to run?
 G:\Tungsten\extapps\MyClassicApp>sencha app watch
 
+✅ Modern-only Project :
 
+  sencha generate app -ext -modern MyModernApp ./MyModernApp
 
+✅ Universal App (Classic + Modern):
 
+sencha generate app --ext MyUniversalApp  ./MyUniversalApp
+
+Running:
+G:\Tungsten\extapps\MyUniversalApp>sencha app watch modern
+Sencha Cmd v7.9.0.35
+[INF] Processing Build Descriptor : modern (development environment)
+^C
+G:\Tungsten\extapps\MyUniversalApp>sencha app watch classic
+Sencha Cmd v7.9.0.35
+[INF] Processing Build Descriptor : classic (development environment)
+^
+Note:
+  In trial version, ui wont be switched automatically
+
+How to test?
+http://localhost:1841/index.html?profile=modern
+http://localhost:1841/index.html?profile=classic
+************************************************************************************************************************************************************
+										   Exploring folders and files
+MyClassicApp/
+├── app/
+ |── build
+---------ext
+├── resources/
+├── app.json
+           app.js
+	   bootstrap.js
+	   bootstrap.json
+	   index.html
+     	   build.xml
+	  workspace.json
+	  bootstrap.css
+
+├── app/
+│       model
+	  store
+          view  
+    Application.js
+    Application.scss
+**********************************************************************************************************************************************************
+									   Boot Process
+*********************************************************************************************************************************************************
+Boot process refers to how an ext js application is initialized and loaded
+It involves multiple steps from loading the Ext JS library to launching your application main view(Landing page)
+
+index.html  -Application Entry Point
+  The browser first loads the index.html
+
+http://localhost:1841
+
+1.A DoctType declaration
+2.Script tag which initialize global Ext Namespace
+3.Script tag which initialize the file called "bootstrap.js"
+4.read  - Ext.manifest = Ext.manifest || "bootstrap.json";
+5.boostrap.json is manifest file used by boostrap.js
+   to load dynamically classes,themes,packages and framework files during startup time.
+6.link tags which loads Styling- all css assets
+7.Loading app.js  which loads Application.js
+8.Lanuch Application that means first landing View (Output)
+    8.1.Main View(main.js) 
+    8.2.ViewModel
+    8.3.Controller
+          ---->Final Output -Render To DOM
+
+           index.html------------> bootstrap.js (loads bootstrap.json--->loads ext.js and app classes)---->Ext.application---->Application.js -->launch()--->Main View(View--->ViewModel--Controller) --->Render To Dom
 
 
 

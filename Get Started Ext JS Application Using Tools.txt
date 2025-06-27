@@ -25,7 +25,7 @@ https://store.sencha.com/?_gl=1%2Anrlhe1%2A_gcl_au%2AODAzOTA5NjQyLjE3NDc4MzAxOTU
 
 Trail Version:
 ........................
-1.Download trail sdk and command line tools
+1.Download trail SDK and command line tools
 2.SenchaCmd-7.9.0.35-windows-64bit
    Install
 
@@ -44,7 +44,7 @@ To get help on commands use the help command:
 
     sencha help generate app
 **********************************************************************************************************************************************************
-										 Types of Ext Application
+									 Types of Ext Application
 **********************************************************************************************************************************************************
 1.Browser based Desktop application - Fixed width
     Desktop browser application - legacy way of creating application
@@ -169,8 +169,8 @@ http://localhost:1841
 3.Script tag which initialize the file called "bootstrap.js"
 4.read  - Ext.manifest = Ext.manifest || "bootstrap.json";
 5.boostrap.json is manifest file used by boostrap.js
-   to load dynamically classes,themes,packages and framework files during startup time.
-6.link tags which loads Styling- all css assets
+   to load dynamically classes, themes, packages and framework files during startup time.
+6.link tags which loads Styling- all CSS assets
 7.Loading app.js  which loads Application.js
 8.Lanuch Application that means first landing View (Output)
     8.1.Main View(main.js) 
@@ -179,6 +179,6 @@ http://localhost:1841
           ---->Final Output -Render To DOM
 
            index.html------------> bootstrap.js (loads bootstrap.json--->loads ext.js and app classes)---->Ext.application---->Application.js -->launch()--->Main View(View--->ViewModel--Controller) --->Render To Dom
-
+************************************************************************************************************************************************************
 
 

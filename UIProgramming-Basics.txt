@@ -1,0 +1,178 @@
+											UI Programming
+										    (DOM Programming)
+************************************************************************************************************************************************************
+DOM programming is nothing dynamically create html elements, modify the existing elements, deleting and iterating elements
+Ext.js is rich DOM programming framework.
+
+JS DOM Programming:
+
+Project Setup:
+
+sencha generate app -ext -modern MyApp ./MyApp
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <script>
+        function createElement(){
+            console.log('creating')
+            var heading= document.createElement('h1')
+            heading.innerHTML='Hello'
+            document.getElementById('root').appendChild(heading)
+        }
+        createElement()
+    </script>
+</head>
+<body>
+    <div id="root">
+
+    </div>
+</body>
+</html>
+After running this code,  you get error
+Uncaught TypeError: Cannot read properties of null (reading 'appendChild')
+    at createElement (index.html:12:44)
+    at index.html:14:9
+
+Use case: what if i want to access DOM element inside head section, before it is initialized
+
+Solution:
+ You should not trigger the js code "Until" DOM is ready.
+How to write code , that triggers the DOM is ready.
+
+Solution: 
+   Events : do something after something happened.
+
+dom objects - window,document,history,location
+
+window- ViewPort- Browser Rendering area.
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <!-- <script>
+        function createElement() {
+            console.log('creating')
+            var heading = document.createElement('h1')
+            heading.innerHTML = 'Hello'
+            var rootElement = document.getElementById('root')
+            console.log(rootElement)
+            rootElement.appendChild(heading)
+        }
+        createElement()
+    </script> -->
+    <script>
+        function createElement() {
+            console.log('creating')
+            var heading = document.createElement('h1')
+            heading.innerHTML = 'Hello'
+            var rootElement = document.getElementById('root')
+            console.log(rootElement)
+            rootElement.appendChild(heading)
+        }
+        window.onload = function () {
+            createElement()
+        }
+    </script>
+</head>
+
+<body>
+    <div id="root">
+
+    </div>
+    <!-- <script>
+        function createElement() {
+            console.log('creating')
+            var heading = document.createElement('h1')
+            heading.innerHTML = 'Hello'
+            var rootElement = document.getElementById('root')
+            console.log(rootElement)
+            rootElement.appendChild(heading)
+        }
+        createElement()
+    </script> -->
+</body>
+
+</html>
+
+Ext.js DOM ready Hooks:
+...........................................
+
+1.Ext.onReady function    => window.onLoad
+2.Ex.application function   =>
+
+Ext.OnReady
+  Used to execute a code /function when the DOM is fully loaded.
+ 
+Use Case:
+  Where three is no MVC apps/MVVM Apps
+  When you test Small UI
+  When you use CDN based coding
+
+eg:
+app.js
+//Ext.onReady
+Ext.onReady(function () {
+    console.log('DOM is ready')
+    var heading = document.createElement('h1')
+    heading.innerHTML = 'Hello'
+    var rootElement = document.getElementById('root')
+    console.log(rootElement)
+    rootElement.appendChild(heading)
+})
+
+Ext.application
+ Used to bootstrap  a full Ext.js application (Supports for MVC/MMVM architecture)
+
+Use Case:
+ Structured Application
+ When using controllers,models,views,ViewModels,Stores
+
+eg:
+
+Ext.application({
+    name: 'MyApp', //name of the application : this is namespace prefix
+    launch: function () {
+        console.log('DOM is ready')
+        var heading = document.createElement('h1')
+        heading.innerHTML = 'Hello'
+        var rootElement = document.getElementById('root')
+        console.log(rootElement)
+        rootElement.appendChild(heading)
+    }
+})
+***********************************************************************************************************************************************************									Classes and objects inside app.js
+
+Ext.define('MyApp.model.Person', {
+    config: {
+        name: ''
+    },
+    constructor: function (config) {
+        this.initConfig(config)
+    }
+})
+
+Ext.application({
+    name: 'MyApp', //name of the application : this is namespace prefix
+    launch: function () {
+        //create instance
+        var person = Ext.create('MyApp.model.Person', {
+            name: 'Subramanian Murugan'
+        })
+        console.log(person.getName())
+    }
+})
+
+
+
+
+
+
+

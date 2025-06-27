@@ -1,0 +1,145 @@
+											 Components
+************************************************************************************************************************************************************
+Component is nothing but Object.
+
+Objects: Abstract
+
+1.Entity
+     Entity  represents database table
+2.Model
+    Model represents pojo object having some properties
+3.Component
+    Component is represented In UI Programming as Visual element like TextBox,lable,Buttons,Grids,Forms ,Video Player,Image etc......
+    Since Component is Object, which contains
+	-State (instance variables)
+        -methods
+        -Visual Element
+4.Controller
+5. ViewModel  
+etc....
+
+In Ext.js All Objects have thier own classes , defined in the ext framework.
+
+All Classes begins with 'Ext.' namespace.
+***********************************************************************************************************************************************************
+										Ext.js Components
+***********************************************************************************************************************************************************
+ An Ext JS application's UI is made up of one or many widgets called Components.
+
+  Ext JS provides a wide range of useful Components out of the box, and any Component can easily be extended to create a customized Component.
+ 
+  Since EXT.js is object oriented, All compoenents are organized in proper hierachial structure.
+
+Key Characteristics:
+................................
+Base Class: 
+	All Components are subclasses of the Ext.Component class. which allows them to participate in automated lifecycle management including instantiation, rendering, sizing and positioning, and destruction
+
+Config Driven:
+   Components are highly configurable through a config object passed during creation.
+
+Lifecycle:
+Components go through a lifecycle:
+
+Instantiation
+Rendering
+Event binding
+Destruction
+
+Available Components
+There are many components. They are separated into 4 main groups:
+
+Navigation components
+
+ Ext.Toolbar
+ Ext.Button
+ Ext.TitleBar
+ Ext.SegmentedButton
+ Ext.Title
+ Ext.Spacer
+
+Store-bound components
+
+ Ext.dataview.DataView
+ Ext.Carousel
+ Ext.List
+ Ext.NestedList
+ 
+Form components
+
+Ext.form.Panel
+Ext.form.FieldSet
+Ext.field.Checkbox
+Ext.field.Hidden
+Ext.field.Slider
+Ext.field.Text
+Ext.picker.Picker
+Ext.picker.Date
+
+General components
+
+Ext.Panel
+Ext.tab.Panel
+Ext.Viewport
+Ext.Img
+Ext.Audio
+Ext.Video
+Ext.Sheet
+Ext.ActionSheet
+Ext.MessageBox
+***********************************************************************************************************************************************************
+									Hello World Compoent
+***********************************************************************************************************************************************************
+index.html
+<body>
+    <div id="root">
+    </div>
+</body>
+
+Ext.application({
+    name: 'MyApp', //name of the application : this is namespace prefix
+    launch: function () {
+        //Helloworld
+        var panel = Ext.create('Ext.panel.Panel', {
+            html: '<h1>Hello,Ext.js, How are you?</h1>',
+            // renderTo: 'root',
+           // renderTo: Ext.getBody()
+            // renderTo: Ext.getBody()
+        })
+        console.log(panel)
+    }
+})
+
+Notes:
+
+1.In modern app you cant render ui using "Ext.getBody" that means you cant render inside body directly (ViewPort)
+
+Ext.getBody is not typically supported or used in Modern App Toolkit
+**********************************************************************************************************************************************************
+									Creating Custom Component
+********************************************************************************************************************************************************
+Ext.define('MyApp.panel.MyPanel', {
+    extend: 'Ext.panel.Panel',
+    //override the Panel properties 
+    html:'<h1>Hello,This is Custom Panel</h1>',
+    renderTo:'root'
+})
+
+Ext.application({
+    name: 'MyApp', //name of the application : this is namespace prefix
+    launch: function () {
+        //create instance
+        var panel = Ext.create('MyApp.panel.MyPanel')
+        console.log(panel)
+
+    }
+})
+**********************************************************************************************************************************************************
+										Component Architecture
+***********************************************************************************************************************************************************
+
+In Component driven architecture 
+  1.Component can nest another component.
+   2.Large UI is Broken down into smaller and smaller UI and integrated later 
+					
+

@@ -1,2 +1,398 @@
 										Containers and Layouts
 ************************************************************************************************************************************************************
+							Exjs Containers
+.............................................................................................................................................................................................
+📦 What is a Container in Ext JS?
+In Ext JS, a container is a special kind of component that can hold and manage child components.
+It’s like a box that organizes how its child elements (panels, buttons, fields, etc.) are displayed and behave.
+
+Key point: All containers are components, but not all components are containers.
+
+
+⚙️ Why use Containers?
+To group related components together.
+To control layout and arrangement of child components.
+To manage component hierarchy and nesting.
+
+
+🗂️ Common Ext JS Containers
+Here are some frequently used containers:
+
+| Container                     | Description                                                                   |
+| ----------------------------- | ----------------------------------------------------------------------------- |
+| **Ext.container.Container**   | Base class for all containers. Not used directly often.                       |
+| **Ext.panel.Panel**           | The most common container — provides a header, tools, body, and docked items. |
+| **Ext.form.Panel**            | Specialized container for managing forms and fields.                          |
+| **Ext.tab.Panel**             | Container with tabbed navigation.                                             |
+| **Ext.window.Window**        | Floating, draggable container — behaves like a dialog or popup.               |
+| **Ext.container.Viewport**    | Special top-level container that fills the entire browser window.             |
+| **Ext.container.ButtonGroup** | Groups buttons together in a panel.                                           |
+| **Ext.toolbar.Toolbar**       | Container for arranging buttons and controls horizontally or vertically.      |
+
+Layout:
+   Design a page , How to organize the elements in order.
+
+Layouts are organized in web using css.
+
+Common Term:
+box:
+  In Any UI, box represents UI element.
+ Every UI element is box eg: div,button,TextBox
+ Since Every UI is box, which common properties
+
+Layout common css properties:
+
+1.width
+2.height
+space Allocation
+ 3.margin
+   space is allocated outside the box
+   Top,right,bottom,left - eg: marginTop:10px
+ 4.padding
+    space is allocated inside the box
+ Top,right,bottom,left - eg: marginPadding:10px
+
+CSS layout patterns:
+1.fixed width layout
+   layout is based on screen fixed width -  legacy way of designing web pages . Before 2007
+   float,position
+
+2.Responsive layout .After 2007
+     Based on screen resolution, width is automatically set (either increased or decreased)
+     width is mentioned in % ,eg 100%
+
+3. grid layout
+    Based on responsive layout but you dont need to calculate values for page.
+   going to represent your page as "column and row"
+
+4.flexbox
+   Based on grid layout, but ui designed based on either column or row.
+
+Layouts in Ext.js:
+...........................
+📐 How do Containers control Layout?
+Each container uses a layout manager to arrange its children.
+Some common layouts are:
+
+| Layout          | Description                                                       |
+| --------------- | ----------------------------------------------------------------- |
+| **fit**         | One child fills the entire container.                             |
+| **hbox / vbox** | Children arranged horizontally or vertically.                     |
+| **border**      | Splits container into regions (north, south, east, west, center). |
+| **card**        | One child visible at a time (like a wizard or tab view).          |
+| **column**      | Children arranged in columns with proportional widths.            |
+| **anchor**      | Children sized relative to container size.                        |
+| **absolute**    | Children positioned with x/y coordinates.                         |
+
+
+..........................................................................................................................................................................................
+								Panel
+.........................................................................................................................................................................................
+
+🗂️ What is Ext.panel.Panel?
+✅ Panel is a versatile container that can hold other components and provides:
+
+a header (with title, tools, icons)
+
+a body (where content or child components live)
+
+optional toolbar(s) (top, bottom, left, or right)
+
+collapsible, resizable, closable, and more.
+
+It’s used for grouping content in a structured box with optional framing.
+
+⚙️ Key Features
+
+| Feature                   | Purpose                                  |
+| ------------------------- | ---------------------------------------- |
+| **title**                 | Shows a header with text.                |
+| **html**                  | Set static HTML content in the body.     |
+| **items**                 | Add child components.                    |
+| **tools**                 | Add icons like collapse, gear, close.    |
+| **tbar/bbar/dockedItems** | Add toolbars or buttons docked to edges. |
+| **collapsible**           | Allow user to collapse/expand the panel. |
+| **layout**                | Manage layout of child components.       |
+
+Eg: Basic Properties , Height and width:
+....................................................................
+
+Default width:
+  is calculated according screen width or parent width
+Default height:
+  It is calculated according to content height
+
+Ext.application({
+    name: 'MyApp', //name of the application : this is namespace prefix
+    launch: function () {
+        Ext.create('Ext.panel.Panel', {
+            title: 'Panel with TextBox and Button',
+            width: 600,
+            height:500,
+            html:'<h1>This is simple Panel with Height and width</h1>',
+            renderTo: Ext.getBody() //View Port
+        })
+
+    }
+})
+********************************************************************************************************************************************************
+								
+Ext.application({
+    name: 'MyApp', //name of the application : this is namespace prefix
+    launch: function () {
+        Ext.create('Ext.panel.Panel', {
+            title: 'Panel with TextBox and Button',
+            width: 50,
+           // margin: 100, // top,right,bottom,left
+            margin:'10 20 30 50',
+            height: 500,
+            html: `
+            
+                <h1>This is simple Panel with Height and width</h1>
+            <h1>This is simple Panel with Height and width</h1>
+            <h1>This is simple Panel with Height and width</h1><h1>This is simple Panel with Height and width</h1><h1>This is simple Panel with Height and width</h1><h1>This is simple Panel with Height and width</h1>
+            
+            `,
+            renderTo: Ext.getBody() //View Port
+        })
+
+    }
+})
+**********************************************************************************************************************************************************
+										
+Ext.application({
+    name: 'MyApp', //name of the application : this is namespace prefix
+    launch: function () {
+        Ext.create('Ext.panel.Panel', {
+            title: 'Panel with More Configuration',
+            width: 500,
+            margin: '10 20 30 50',
+            height: 500,
+            collapsible: true,
+            collapsed: true,
+            //toolbar
+            tbar: [
+                {
+                    text: 'Add',
+                    handler: function () {
+                        Ext.Msg.alert('Add', 'Add Button is clicked')
+                    }
+                },
+                '->',
+
+                {
+                    text: 'Delete',
+                }
+            ],
+            bbar: [{
+                text: 'Save'
+            },
+                '->',
+            {
+                text: 'Cancel'
+            }
+            ],
+            tools: [
+                {
+                    type: 'help',
+                    handler: function () {
+                        Ext.Msg.alert('Help')
+                    }
+                }
+            ],
+            buttons: [{
+                text: 'MyButton'
+            }],
+
+            renderTo: Ext.getBody() //View Port
+        })
+
+    }
+})
+***********************************************************************************************************************************************************
+												Layouts
+
+What are Layouts?
+Layouts control how child components are sized and positioned inside a container.
+Each container has one layout at a time, but can have multiple child components.
+
+Every container has a layout that manages the sizing and positioning of its child Components. 
+
+vbox and hbox:
+  Both layout types are used to arrange child compoents vertically(vbox) or horizontally(hbox).
+ This layout belong to the Box layout family, which gives control over sizing,alignment, and spacing
+
+vbox:
+ Arranges items top to bottom.
+
+layout: 'vbox'
+or
+layout: {
+  type:'vbox'
+  align:'strech' //make children stretch to container width
+}
+
+
+Ext.application({
+    name: 'MyApp', //name of the application : this is namespace prefix
+    launch: function () {
+        Ext.create('Ext.panel.Panel', {
+            title: 'Panel with More Configuration',
+            width: 500,
+            margin: '10 20 30 50',
+            height: 500,
+            collapsible: true,
+            collapsed: false,
+            bodyPadding:10,
+            layout: {
+                type: 'vbox',
+                align:'stretch'
+            },
+            items: [
+                {
+                    xtype: 'panel',
+                    title: 'Top Panel',
+                    html: '1st panel'
+                },
+                {
+                    xtype: 'panel',
+                    title: 'Bottom Panel',
+                    html: '2st panel'
+                }
+            ],
+            renderTo: Ext.getBody() //View Port
+        })
+
+    }
+})
+type: 'hbox'
+This sets the layout type to Horizontal Box Layout.
+
+It arranges child items in a single row, from left to right
+
+align: 'stretch'
+This is an alignment option for hbox.
+
+It makes all child items expand vertically to fill the height of the container.
+
+hbox options:
+
+Option		Meaning
+align: 'top'	Items align to the top of the container (default).
+align: 'middle'	Items align vertically centered.
+align: 'stretch'	Items stretch to fill the container's height.
+align: 'stretchmax'	All items get the height of the tallest item.
+
+What is flex?
+flex is a proportional sizing property.
+
+It works like CSS flex-grow.
+
+It determines how much space an item should take relative to its siblings within an hbox or vbox layout.
+
+It only applies to the main axis:
+
+In hbox: width
+
+In vbox: height
+
+📐 How does it work?
+Child items without flex use their fixed width or height.
+
+Child items with flex share the remaining space proportionally.
+
+
+..................................................................................................................................................................................................................................
+											hbox
+				
+
+Ext.application({
+    name: 'MyApp', //name of the application : this is namespace prefix
+    launch: function () {
+        Ext.create('Ext.panel.Panel', {
+            title: 'Panel with More Configuration',
+            // width: 500,
+            margin: '10 20 30 50',
+            height: 500,
+            collapsible: true,
+            collapsed: false,
+            bodyPadding: 10,
+            layout: {
+                type: 'hbox',
+                align: 'stretch'
+            },
+            items: [
+                {
+                    xtype: 'panel',
+                    title: 'Top Panel',
+                    flex: 2,
+                    html: '1st panel'
+                },
+                {
+                    xtype: 'panel',
+                    title: 'Bottom Panel',
+                    margin: '2 2 2 2',
+                    bodyPadding: 5,
+                    flex: 3,
+                    html: '2st panel'
+                },
+                {
+                    xtype: 'panel',
+                    title: 'Bottom Panel',
+                    margin: '2 2 2 2',
+                    bodyPadding: 5,
+                    flex: 3,
+                    html: '2st panel'
+                },
+                {
+                    xtype: 'panel',
+                    title: 'Bottom Panel',
+                    margin: '2 2 2 2',
+                    bodyPadding: 5,
+                    flex: 3,
+                    html: '2st panel'
+                }
+            ],
+            renderTo: Ext.getBody() //View Port
+        })
+
+    }
+})
+ Result:
+   {
+            xtype: 'panel',
+            title: 'Panel 1',
+            flex: 1 // gets 1 part
+        },
+        {
+            xtype: 'panel',
+            title: 'Panel 2',
+            flex: 2 // gets 2 parts
+        }
+Both panels fill the height (because of align: 'stretch').
+
+Total available width is divided into 3 parts.
+
+Panel 1 gets 1 part.
+
+Panel 2 gets 2 parts.
+
+So: Panel 1 = ~33% width, Panel 2 = ~67% width.
+
+Without flex
+If you remove flex:
+
+items: [
+    { xtype: 'panel', title: 'Panel 1', width: 100 },
+    { xtype: 'panel', title: 'Panel 2', width: 200 }
+]
+✅ Then widths are fixed — not proportional.
+
+In summary
+flex = proportional sizing within a box layout.
+
+Used mostly in hbox (horizontal) and vbox (vertical).
+
+Allows flexible, fluid UIs without pixel-perfect sizes.
+
+   

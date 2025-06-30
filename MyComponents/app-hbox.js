@@ -4,45 +4,27 @@ Ext.application({
     launch: function () {
         Ext.create('Ext.panel.Panel', {
             title: 'Panel with More Configuration',
-            // width: 500,
+            width: 500,
             margin: '10 20 30 50',
             height: 500,
             collapsible: true,
             collapsed: false,
-            bodyPadding: 10,
+            bodyPadding:10,
             layout: {
-                type: 'hbox',
-                align: 'stretch'
+                type: 'vbox',
+                align:'stretch'
             },
             items: [
                 {
                     xtype: 'panel',
                     title: 'Top Panel',
-                    flex: 2,
+                    flex:1,
                     html: '1st panel'
                 },
                 {
                     xtype: 'panel',
                     title: 'Bottom Panel',
-                    margin: '2 2 2 2',
-                    bodyPadding: 5,
-                    flex: 3,
-                    html: '2st panel'
-                },
-                {
-                    xtype: 'panel',
-                    title: 'Bottom Panel',
-                    margin: '2 2 2 2',
-                    bodyPadding: 5,
-                    flex: 3,
-                    html: '2st panel'
-                },
-                {
-                    xtype: 'panel',
-                    title: 'Bottom Panel',
-                    margin: '2 2 2 2',
-                    bodyPadding: 5,
-                    flex: 3,
+                    flex:2,
                     html: '2st panel'
                 }
             ],

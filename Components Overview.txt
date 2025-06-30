@@ -18,7 +18,7 @@ Objects: Abstract
 5. ViewModel  
 etc....
 
-In Ext.js All Objects have thier own classes , defined in the ext framework.
+In Ext.js All Objects have their own classes , defined in the ext framework.
 
 All Classes begins with 'Ext.' namespace.
 ***********************************************************************************************************************************************************
@@ -28,7 +28,7 @@ All Classes begins with 'Ext.' namespace.
 
   Ext JS provides a wide range of useful Components out of the box, and any Component can easily be extended to create a customized Component.
  
-  Since EXT.js is object oriented, All compoenents are organized in proper hierachial structure.
+  Since EXT.js is object oriented, All components are organized in proper hierarchical structure.
 
 Key Characteristics:
 ................................
@@ -88,7 +88,7 @@ Ext.Sheet
 Ext.ActionSheet
 Ext.MessageBox
 ***********************************************************************************************************************************************************
-									Hello World Compoent
+									Hello World Component
 ***********************************************************************************************************************************************************
 index.html
 <body>
@@ -140,6 +140,418 @@ Ext.application({
 
 In Component driven architecture 
   1.Component can nest another component.
-   2.Large UI is Broken down into smaller and smaller UI and integrated later 
+   2.Large UI is Broken down into smaller and smaller UI and integrated later .
 					
+Level 1: create components and nest:
+Ext.define('MyApp.panel.MyPanel', {
+    extend: 'Ext.panel.Panel',
+    //override the Panel properties 
+    html: '<h1>Hello,This is Custom Panel</h1>',
+    renderTo: 'root'
+})
+
+Ext.application({
+    name: 'MyApp', //name of the application : this is namespace prefix
+    launch: function () {
+        var Header = Ext.create('Ext.panel.Panel', {
+            html: '<h1>Header!</h1>'
+        })
+        var Footer = Ext.create('Ext.panel.Panel', {
+            html: '<h1>Footer</h1>'
+        })
+        var BodyContent = Ext.create('Ext.panel.Panel', {
+            html: `<p>
+                    Ext.js is component driven Framework
+                </p>`
+        })
+        var Body = Ext.create('Ext.panel.Panel', {
+            items: [
+                BodyContent,
+                Ext.create('Ext.panel.Panel', {
+                    html: `
+                        <p>
+                        Ext JS is a powerful JavaScript framework and UI library developed 
+                        by Sencha. It is used to build cross-platform web and mobile applications with
+                        a comprehensive set of pre-built UI components and tools. Ext JS is known for its rich set of features, including a large library of customizable widgets, data visualization tools
+                        , and integration capabilities with other frameworks. 
+                        </p>
+                    `
+                }),
+                Ext.create('MyApp.panel.MyPanel')
+            ]
+        })
+        Ext.create('Ext.panel.Panel', {
+            // html:'Header',
+            items: [
+                Header,
+                Body,
+                Footer,
+            ], //referes the other component
+            renderTo: 'root'
+        })
+
+
+    }
+})
+***********************************************************************************************************************************************************
+								Shorts cuts to refer component within another component
+***********************************************************************************************************************************************************
+Way 1 : refer components within another component using items array.
+
+Ext.define('MyApp.panel.MyPanel', {
+    extend: 'Ext.panel.Panel',
+    //override the Panel properties 
+    html: '<h1>Hello,This is Custom Panel</h1>',
+})
+
+Ext.application({
+    name: 'MyApp', //name of the application : this is namespace prefix
+    launch: function () {
+        Ext.create('Ext.panel.Panel', {
+            items: [
+                Ext.create('Ext.panel.Panel', {
+                    html: '<h1>Header!</h1>'
+                }),
+                Ext.create('Ext.panel.Panel', {
+                    items: [
+                        Ext.create('Ext.panel.Panel', {
+                            html: `
+                        <p>
+                        Ext JS is a powerful JavaScript framework and UI library developed 
+                        by Sencha. It is used to build cross-platform web and mobile applications with
+                        a comprehensive set of pre-built UI components and tools. Ext JS is known for its rich set of features, including a large library of customizable widgets, data visualization tools
+                        , and integration capabilities with other frameworks. 
+                        </p>
+                    `
+                        }),
+                        Ext.create('MyApp.panel.MyPanel')
+                    ]
+                }),
+                Ext.create('Ext.panel.Panel', {
+                    html: '<h1>Footer</h1>'
+                }),
+            ], //referes the other component
+            renderTo: 'root'
+        })
+
+
+    }
+})
+
+........................................................................................................................................................................................................................................
+											xtype
+.......................................................................................................................................................................................................................................
+What is xtype?
+	In Ext JS, xtype is a shorthand identifier for a class of components.
+	It tells Ext JS which type of component to create — but in a more concise way than writing the full class name.						
+
+👉 Think of xtype as an alias for a component class.
+
+🔑 Why use xtype?
+✅ Shorter & cleaner configuration
+✅ Useful in items arrays inside containers
+✅ Enables lazy instantiation (Ext JS creates components only when needed)	
+
+When you define a component with xtype, Ext JS maps it to its full class automatically.
+
+| Class               | xtype      |
+| ------------------- | ---------- |
+| `Ext.button.Button` | `'button'` |
+| `Ext.panel.Panel`   | `'panel'`  |
+| `Ext.grid.Panel`    | `'grid'`   |
+| `Ext.form.Panel`    | `'form'`   |
+
+//custom component
+// Ext.define('MyApp.panel.MyPanel', {
+//     extend: 'Ext.panel.Panel',
+//     xtype:'greeter', //assigning xtype 
+//     html: '<h1>Hello,This is Custom Panel</h1>',
+// })
+Ext.define('MyApp.panel.MyPanel', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'greeter', //assigning xtype 
+})
+
+Ext.application({
+    name: 'MyApp', //name of the application : this is namespace prefix
+    launch: function () {
+        Ext.create('Ext.panel.Panel', {
+            items: [
+                {
+                    xtype: 'panel',
+                    html: '<h1>Header</h1>'
+                }, {
+                    xtype: 'panel',
+                    html: `<div>
+                         <p>
+                        Ext JS is a powerful JavaScript framework and UI library developed 
+                        by Sencha. It is used to build cross-platform web and mobile applications with
+                        a comprehensive set of pre-built UI components and tools. Ext JS is known for its rich set of features, including a large library of customizable widgets, data visualization tools
+                        , and integration capabilities with other frameworks. 
+                        </p>
+                    </div>
+                    `
+                }, {
+                    xtype: 'greeter',
+                    html: '<h1>Weclome to Component</h1>'
+                }
+
+            ], //referes the other component
+            renderTo: 'root'
+        })
+
+
+    }
+})
+**********************************************************************************************************************************************************
+								  Components and Listeners
+**********************************************************************************************************************************************************
+Use case:
+✅ A Panel
+✅ With a TextField and a Button inside
+✅ The Button should have a listener (handler)
+✅ Inside the handler, you want to access the TextField’s value.
+
+Event Handlers:
+...........................
+In js , an event listener is a way to run code in response to events , event means some actions(clicks,touch,keyboard press)
+Every html element is bound with event.
+
+eg:
+ domElement.addEventListener('nameofEvent',function(evt){
+  //the code to be executed when certain event is occured
+
+})
+evt - is "EventTarget"/ "Event" Object reference
+You can refere dom element reference using evt Variable
+
+Types of Events:
+
+1.Hardware events
+	mouse,keyboard,touch 
+ mouse-click,dblclick
+keyboard - keypress,keyrelease
+touch - ontouch
+
+document.getElementById('btn').addEventListener('click',function(){
+
+}) - handler
+
+2.Application Events
+Dom Ready
+
+Attaching Events in Ext.js
+
+Usecase : 1 :How to attach simple listener
+
+Ext.application({
+    name: 'MyApp', //name of the application : this is namespace prefix
+    launch: function () {
+        Ext.create('Ext.panel.Panel', {
+            items: [
+                {
+                    xtype: 'button',
+                    text: 'Click',
+                    //listner
+                    handler: function () {
+                        //write logic when button is clicked
+                        //console.log('button is clicked')
+                        Ext.Msg.alert('Title','You clicked button')
+                    }
+                }
+
+            ], //referes the other component
+            renderTo: 'root'
+        })
+
+
+    }
+})
+
+Use case 2: Acces TextBox Value
+
+Ext.application({
+    name: 'MyApp', //name of the application : this is namespace prefix
+    launch: function () {
+        Ext.create('Ext.panel.Panel', {
+            title: 'Panel with TextBox and Button',
+            width: 600,
+            height: 500,
+            bodyPadding: 10,
+            items: [
+                {
+                    xtype: 'textfield',
+                    fieldLabel: 'Name',
+                    itemId: 'myTextField' // Given an itemId to find it easily 
+                },
+                {
+                    xtype: 'button',
+                    text: 'Click',
+                    //listner
+                    handler: function (btn) {
+                        //Get the Button Object reference
+                        //Get the Immediate Parent Object Reference
+                        var panel = btn.up('panel')
+                        //console.log(panel)
+                        console.log(panel.getTitle())
+                        //set the new Panel Title when i click the button
+                        //  Ext.Msg.alert('')
+                        panel.setTitle('Welcome To Event Listeners')
+                        console.log(panel.getTitle())
+                        //Get the TextField Value
+                        var textfield = panel.down('#myTextField')
+                        console.log(textfield.getValue())
+                        Ext.Msg.alert('YourName',textfield.getValue())
+                    }
+                }
+
+            ], //referes the other component
+            renderTo: 'root'
+        })
+
+
+    }
+})
+📌 Key points
+✅ xtype: 'textfield' → Adds the textbox.
+✅ itemId → Unique ID within the container (good for .down() selector).
+✅ handler → The Button’s click listener.
+✅ btn.up('panel') → Gets the parent Panel.
+✅ panel.down('#myTextField') → Finds the TextField inside the Panel.
+✅ getValue() → Gets the current input value.
+
+⚙️ How it works
+When the Button is clicked →
+its handler runs →
+it looks up the hierarchy to find the Panel →
+then down to find the TextField →
+then reads its value.
+
+✅ This pattern is the standard in Ext JS
+up() → navigate to a parent container
+down() → find a child by itemId, xtype, or CSS selector.
+**********************************************************************************************************************************************************
+...................................................................................................................................................................................................................................
+								  Event Listener Configuration
+............................................................................................................................................................................................................................
+📌 1️⃣ handler — What is it?
+✅ handler is a shortcut for the most common event (usually click on a button, or change on a field).
+✅ You can only define one handler per component.
+✅ It’s mostly used on buttons and menu items for quick click actions.
+
+{
+    xtype: 'button',
+    text: 'Click Me',
+    handler: function(btn) {
+        Ext.Msg.alert('Hello', 'Button clicked!');
+    }
+}
+👉 Equivalent to:
+{
+    xtype: 'button',
+    text: 'Click Me',
+    listeners: {
+        click: function(btn) {
+            Ext.Msg.alert('Hello', 'Button clicked!');
+        }
+    }
+}
+
+👉 So with listeners you can handle many events for the same component.
+
+
+{
+    xtype: 'textfield',
+    fieldLabel: 'Name',
+    listeners: {
+        change: function(field, newValue, oldValue) {
+            console.log('Value changed from', oldValue, 'to', newValue);
+        },
+        focus: function(field) {
+            console.log('TextField focused');
+        }
+    }
+}
+
+📌 4️⃣ When to use which?
+✅ Use handler
+
+For simple, quick click actions on buttons or menu items.
+
+Keeps your config short and clean.
+
+✅ Use listeners
+
+For complex components (grids, panels, fields).
+
+When you need multiple event types.
+
+When you want to attach events declaratively in config.
+
+ Best Practice
+👉 For simple buttons: handler
+👉 For fields, panels, grids, custom components: listeners
+👉 For multiple events: listeners is the way to go!
+
+Ext.application({
+    name: 'MyApp', //name of the application : this is namespace prefix
+    launch: function () {
+        Ext.create('Ext.panel.Panel', {
+            title: 'Panel with TextBox and Button',
+            width: 600,
+            height: 500,
+            bodyPadding: 10,
+            items: [
+                {
+                    xtype: 'textfield',
+                    fieldLabel: 'Name',
+                    itemId: 'myTextField', // Given an itemId to find it easily 
+                    listeners: {
+                        change: function (field, newValue, oldValue) {
+                            console.log('Value changed from ', oldValue, 'to', newValue)
+                        },
+                        focus: function (field) {
+                            console.log('TextFiled focused')
+                        }
+                    }
+
+                },
+                {
+                    xtype: 'button',
+                    text: 'Click',
+                    //listner
+                    listeners: {
+                        click: function (btn) {
+                            //Get the Button Object reference
+                            //Get the Immediate Parent Object Reference
+                            var panel = btn.up('panel')
+                            //console.log(panel)
+                            console.log(panel.getTitle())
+                            //set the new Panel Title when i click the button
+                            //  Ext.Msg.alert('')
+                            panel.setTitle('Welcome To Event Listeners')
+                            console.log(panel.getTitle())
+                            //Get the TextField Value
+                            var textfield = panel.down('#myTextField')
+                            console.log(textfield.getValue())
+                            Ext.Msg.alert('YourName', textfield.getValue())
+                        }
+                    }
+                }
+
+            ], //referes the other component
+            renderTo: 'root'
+        })
+
+
+    }
+})
+***********************************************************************************************************************************************************
+
+
+
+
+
+
+
 

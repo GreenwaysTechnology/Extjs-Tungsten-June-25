@@ -1,0 +1,493 @@
+											 MVC 
+************************************************************************************************************************************************************
+Design patterns in Ext:
+
+1.MVC
+2.MVVM
+
+Ways to structure Application:
+
+Application consists of three parts
+1.View -Presentation - Components- User Interface
+   Role of UI - Just display data and look and feel & Take input from the User
+2.Data - State - Object
+3.Biz logic - functions - listeners
+
+Keeping all three in a single place is not good idea.
+
+We have to separate into layers within single file or separate files and folders
+
+How to separate and link them?
+ With help of Design patterns and implementations
+
+MVC, MVVM
+
+M - Model - data - Object
+C - Controller - Hold biz  - Controller also object
+V- View - UI - Components
+
+📌 What is Ext JS MVC?
+
+1.MVC stands for Model-View-Controller — a design pattern that Ext JS uses to structure applications.
+2.It separates data (Model), UI (View), and logic (Controller) to make large applications easier to manage and scale.
+3.Ext JS has built-in support for MVC.
+
+⚙️ Parts of MVC in Ext JS
+Part			Role							                    Example
+Model	         Defines the data structure and rules.	                                         Ext.define('MyApp.model.User', {...})
+View	          UI    components (panels, grids, forms, windows).                 	Ext.define('MyApp.view.user.List', {...})
+Controller	 Handles user interaction and connects Models and Views.	Ext.define('MyApp.controller.Users', {...})
+
+
+Ext.application({
+    name: 'MyMVCApp',
+    launch: function () {
+        Ext.create('Ext.panel.Panel', {
+            title: 'MVC Panel',
+            items: [
+                {
+                    xtype: 'button',
+                    text: 'Click',
+                    margin:50,
+                    handler: function () {
+                        Ext.Msg.alert('Title', 'This is biz logic')
+                    }
+                }
+
+            ], //referes the other component
+            renderTo: Ext.getBody()
+        })
+    }
+});
+
+1.In the above code, the biz logic is written inside handler
+2.The biz logic is tightly coupled with UI
+
+How to isolate this biz logic into separate code?
+
+Controller
+**********************************************************************************************************************************************************
+									Controllers
+
+ What is a Controller in Ext JS?
+A controller in Ext JS is a core part of the MVC (Model-View-Controller) or MVVM (Model-View-ViewModel) architecture. 
+It acts as the glue between the view (UI components) and the model (data).
+It handles user interactions, responds to events, and updates the view or model accordingly.
+
+🎯 Key Roles of a Controller
+1.Listen to events from views (e.g., button clicks)
+2.Respond with appropriate actions (e.g., call a service, update a store)
+3.Coordinate logic between multiple views
+4.Keep business logic separate from UI layout
+
+In Ext JS, controllers are central to managing application logic and user interactions. 
+
+There are two main types of controllers:
+
+- Classic Controllers (Ext.app.Controller)
+	Introduced in Ext JS 4, these controllers are part of the MVC (Model-View-Controller) architecture. 
+
+syntax:
+   Ext.define('MyApp.controller.CustomerController',{
+   extend:'Ext.app.Controller'
+  })
+
+- ViewControllers (Ext.app.ViewController)
+	Introduced in Ext JS 5 as part of the MVVM (Model-View-ViewModel) pattern. 
+syntax:
+   Ext.define('MyApp.controller.view.CustomerController',{
+   extend:'Ext.app.ViewController'
+  })
+
+................
+
+Step: 1
+declare controller
+
+//Declare controller
+Ext.define('MyApp.controller.MainController', {
+    extend: 'Ext.app.Controller',
+    //override init function:
+    init: function () {
+        console.log('Init is called for initalizing something')
+    }
+})
+
+
+//Declare View
+Ext.define('MyApp.view.Main', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'mainview',
+    title: 'Classic Controller',
+    margin: 50,
+    width: 600,
+    height: 200,
+    items: [
+        {
+            xtype: 'button',
+            margin: 50,
+            text: 'Click',
+            itemId: 'myButton'
+        }
+    ]
+})
+
+Ext.application({
+    name: 'MyMVCApp',
+    launch: function () {
+        Ext.create('MyApp.view.Main', {
+            renderTo: Ext.getBody()
+        })
+    }
+});
+
+After running this code, you can see no output from the controller, because no where we have specified how to create instance of controller
+
+Registration of Controllers:
+..........................................
+//Declare controller
+Ext.define('MyApp.controller.MainController', {
+    extend: 'Ext.app.Controller',
+    //override init function:
+    init: function () {
+        console.log('Init is called for initalizing something')
+    }
+})
+
+//Declare View
+Ext.define('MyApp.view.Main', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'mainview',
+    title: 'Classic Controller',
+    margin: 50,
+    width: 600,
+    height: 200,
+    items: [
+        {
+            xtype: 'button',
+            margin: 50,
+            text: 'Click',
+            itemId: 'myButton'
+        }
+    ]
+})
+
+Ext.application({
+    name: 'MyMVCApp',
+    //controllers configuration: Registring controllers
+    controllers: [
+        'MyApp.controller.MainController'
+    ],
+    launch: function () {
+        Ext.create('MyApp.view.Main', {
+            renderTo: Ext.getBody()
+        })
+    }
+});
+
+In order to bind UI(Button) with Controller, we need to bind with "this.control" method
+
+this.control is used in classic controllers (Ext.app.Controller) to attach event listeners to components using "selectors" 
+
+Selector syntax:
+   xtype, item or CSS-like style
+
+Syntax:
+ this.control({
+   'selector': {
+       eventName: handlerfunction
+   }
+})
+ this.control({
+   'mainview button#myButton': {
+       click: this.onButtonClick
+   }
+})
+eg:
+//Declare controller
+Ext.define('MyApp.controller.MainController', {
+    extend: 'Ext.app.Controller',
+    //override init function:
+    init: function () {
+        console.log('Init is called for initalizing something')
+        //UI binding with this controller
+        this.control({
+            'mainview button#myButton': {
+                click: this.onButtonClick
+            }
+        })
+    },
+    //biz logic
+    onButtonClick: function () {
+        Ext.Msg.alert('Info', 'Button is clicked using classic Controller!')
+    }
+})
+
+//Declare View
+Ext.define('MyApp.view.Main', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'mainview',
+    title: 'Classic Controller',
+    margin: 50,
+    width: 600,
+    height: 200,
+    items: [
+        {
+            xtype: 'button',
+            margin: 50,
+            text: 'Click',
+            itemId: 'myButton'
+        }
+    ]
+})
+
+Ext.application({
+    name: 'MyMVCApp',
+    //controllers configuration: Registring controllers
+    controllers: [
+        'MyApp.controller.MainController'
+    ],
+    launch: function () {
+        Ext.create('MyApp.view.Main', {
+            renderTo: Ext.getBody()
+        })
+    }
+});
+**********************************************************************************************************************************************************
+								TextBox,Button,Controllers
+*********************************************************************************************************************************************************
+//Declare controller
+Ext.define('MyApp.controller.MainController', {
+    extend: 'Ext.app.Controller',
+    //override init function:
+    init: function () {
+        console.log('Init is called for initalizing something')
+        //UI binding with this controller
+        this.control({
+            'mainview button#myButton': {
+                click: this.onButtonClick
+            }
+        })
+    },
+    //biz logic
+    onButtonClick: function (btn) {
+        var panel = btn.up('mainview')
+        var textfield = panel.down('#myTextField')
+        var value = textfield.getValue()
+        Ext.Msg.alert('Info', value)
+    }
+})
+
+//Declare View
+Ext.define('MyApp.view.Main', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'mainview',
+    title: 'Classic Controller',
+    margin: 50,
+    width: 600,
+    layout: 'anchor',
+    height: 200,
+    items: [
+        {
+            xtype: 'textfield',
+            itemId: 'myTextField',
+            anchor: '100%',
+            fieldLabel: 'Enter Name'
+        },
+        {
+            xtype: 'button',
+            margin: '50 20 20 10 ',
+            anchor: '100%',
+            text: 'Click',
+            itemId: 'myButton'
+        }
+    ]
+})
+
+Ext.application({
+    name: 'MyMVCApp',
+    //controllers configuration: Registring controllers
+    controllers: [
+        'MyApp.controller.MainController'
+    ],
+    launch: function () {
+        Ext.create('MyApp.view.Main', {
+            renderTo: Ext.getBody()
+        })
+    }
+});
+*********************************************************************************************************************************************************
+										   Validation
+*********************************************************************************************************************************************************
+
+ Validate the textfield (required/non-empty).
+
+🛠️ Update Main.js for Validation Support:
+Add allowBlank: false to ensure required validation.
+
+{
+    xtype: 'textfield',
+    itemId: 'myTextField',
+    fieldLabel: 'Enter Name',
+    allowBlank: false // Field must not be empty
+}
+✅ Result:
+If the user leaves the field blank and clicks the button ➝ Error popup appears.
+**********************************************************************************************************************************************************
+										Validation code inside controller
+*******************************************************************************************************************************************************
+//Declare controller
+Ext.define('MyApp.controller.MainController', {
+    extend: 'Ext.app.Controller',
+    //override init function:
+    init: function () {
+        console.log('Init is called for initalizing something')
+        //UI binding with this controller
+        this.control({
+            'mainview button#myButton': {
+                click: this.onButtonClick
+            }
+        })
+        //btn.addEventListener('click',function(btn){})
+    },
+    //biz logic
+    onButtonClick: function (btn) {
+        var panel = btn.up('mainview')
+        var textfield = panel.down('#myTextField')
+        var value = textfield.getValue()
+        //validation logic
+        if (!textfield.isValid()) {
+            Ext.Msg.alert('Error', 'Please Enter Value')
+            return;
+        }
+        Ext.Msg.alert('Info', value)
+
+    }
+})
+
+//Declare View
+Ext.define('MyApp.view.Main', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'mainview',
+    title: 'Classic Controller',
+    margin: 50,
+    width: 600,
+    layout: 'anchor',
+    height: 200,
+    items: [
+        {
+            xtype: 'textfield',
+            itemId: 'myTextField',
+            anchor: '100%',
+            fieldLabel: 'Enter Name',
+            //validation properties
+            allowBlank: false,
+        },
+        {
+            xtype: 'button',
+            margin: '50 20 20 10 ',
+            anchor: '100%',
+            text: 'Click',
+            itemId: 'myButton'
+        }
+    ]
+})
+
+Ext.application({
+    name: 'MyMVCApp',
+    //controllers configuration: Registring controllers
+    controllers: [
+        'MyApp.controller.MainController'
+    ],
+    launch: function () {
+        Ext.create('MyApp.view.Main', {
+            renderTo: Ext.getBody()
+        })
+    }
+});
+*****************
+//Declare controller
+Ext.define('MyApp.controller.MainController', {
+    extend: 'Ext.app.Controller',
+    //override init function:
+    init: function () {
+        console.log('Init is called for initalizing something')
+        //UI binding with this controller
+        this.control({
+            'mainview button#myButton': {
+                click: this.onButtonClick
+            }
+        })
+        //btn.addEventListener('click',function(btn){})
+    },
+    //biz logic
+    onButtonClick: function (btn) {
+        var panel = btn.up('mainview')
+        var textfield = panel.down('#myTextField')
+        var value = textfield.getValue()
+        //validation logic
+        if (!textfield.isValid()) {
+            return;
+        }
+        Ext.Msg.alert('Info', value)
+
+    }
+})
+
+//Declare View
+Ext.define('MyApp.view.Main', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'mainview',
+    title: 'Classic Controller',
+    margin: 50,
+    width: 600,
+    layout: 'anchor',
+    height: 200,
+    items: [
+        {
+            xtype: 'textfield',
+            itemId: 'myTextField',
+            anchor: '100%',
+            fieldLabel: 'Enter Name',
+            //validation properties
+            allowBlank: false,
+            minLength: 3,                   // Minimum 3 chars
+            maxLength: 20,
+            msgTarget: 'under',                // Max 20 chars
+            regex: /^[a-zA-Z]+$/,           // Only letters
+            regexText: 'Only letters allowed', // Custom error text
+            //Validation Rule
+            validator: function (value) {
+                if (!value) return 'This field is required';
+                const pattern = /^[A-Z][a-z]*$/; // Must start with capital, followed by lowercase
+
+                if (!pattern.test(value)) {
+                    return 'Name must start with a capital letter and contain only lowercase letters after';
+                }
+
+                return true;
+            }
+        },
+        {
+            xtype: 'button',
+            margin: '50 20 20 10 ',
+            anchor: '100%',
+            text: 'Click',
+            itemId: 'myButton'
+        }
+    ]
+})
+
+Ext.application({
+    name: 'MyMVCApp',
+    //controllers configuration: Registring controllers
+    controllers: [
+        'MyApp.controller.MainController'
+    ],
+    launch: function () {
+        Ext.create('MyApp.view.Main', {
+            renderTo: Ext.getBody()
+        })
+    }
+});
+***********************************************************************************************************************************************************

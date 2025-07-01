@@ -1,6 +1,6 @@
 										Containers and Layouts
 ************************************************************************************************************************************************************
-							Exjs Containers
+											Exjs Containers
 .............................................................................................................................................................................................
 📦 What is a Container in Ext JS?
 In Ext JS, a container is a special kind of component that can hold and manage child components.
@@ -219,8 +219,8 @@ Each container has one layout at a time, but can have multiple child components.
 Every container has a layout that manages the sizing and positioning of its child Components. 
 
 vbox and hbox:
-  Both layout types are used to arrange child compoents vertically(vbox) or horizontally(hbox).
- This layout belong to the Box layout family, which gives control over sizing,alignment, and spacing
+  Both layout types are used to arrange child components vertically(vbox) or horizontally(hbox).
+ This layout belong to the Box layout family, which gives control over sizing, alignment, and spacing
 
 vbox:
  Arranges items top to bottom.
@@ -369,6 +369,7 @@ Ext.application({
             title: 'Panel 2',
             flex: 2 // gets 2 parts
         }
+
 Both panels fill the height (because of align: 'stretch').
 
 Total available width is divided into 3 parts.
@@ -394,5 +395,692 @@ flex = proportional sizing within a box layout.
 Used mostly in hbox (horizontal) and vbox (vertical).
 
 Allows flexible, fluid UIs without pixel-perfect sizes.
+***********************************************************************************************************************************************************
+   										Border
+**********************************************************************************************************************************************************
+Border layout is powerfull container layout that allows you to organize child elements into five regions.
+What’s happening
+Region	Purpose	         Layout
+north	Header	         Fixed height
+west   	Navigation       Fixed width, collapsible
+center	Main content	 Nested vbox and hbox
+south	Footer	          Fixed height
 
+Nested layouts in center:
+vbox: top toolbar + main area
+
+hbox: splits main area into left/right sub panels with flex
+
+✅ Key concepts used
+✔️ Viewport — root container, fills the browser.
+✔️ border layout — classic for dashboards.
+✔️ vbox + hbox + flex — for nested, fluid content arrangement.
+✔️ collapsible + split — make nav panel resizable and hideable.
+
+
+This pattern is commonly used for:
+
+Admin dashboards
+Data-heavy portals
+Split-pane apps
+
+eg;
+
+Ext.application({
+    name: 'MyApp', //name of the application : this is namespace prefix
+    launch: function () {
+        Ext.create('Ext.container.Viewport', {
+            layout: 'border',
+            items: [{
+                //Header
+                region: 'north',
+                xtype: 'panel',
+                title: 'Application Header',
+                height: 60,
+                bodyPadding: 10
+            },
+            {
+                //NavBar
+                region: 'west',
+                xtype: 'panel',
+                title: 'Navigation',
+                width: 200,
+                collapsible: true,
+                split: true,
+                bodyPadding: 10
+            },
+            //Main Content
+            {
+                region: 'center',
+                xtype: 'container', //Ext.container.Container
+                flex: 1, // takes the whole space 
+                layout: {
+                    type: 'hbox',
+                    align: 'stretch'
+                },
+                items: [
+                    {
+                        xtype: 'panel',
+                        title: 'Left Sub Panel',
+                        flex: 1,
+                        margin: '5'
+                    },
+                    {
+                        xtype: 'panel',
+                        title: 'Right Sub Panel',
+                        flex: 2,
+                        margin: '5'
+                    }],
+
+            },
+            {
+                region: 'south',
+                xtype: 'panel',
+                title: 'Application Footer',
+                height: 40,
+                bodyPadding: 5
+            }
+
+            ],
+            // SOUTH: Footer
+        })
+    },
+
+
+})
+********************************************************************************************************************************************************
+.........................................................................................................................................................................................
+								fit layout
+........................................................................................................................................................................................
+
+ What is fit layout?
+The fit layout is one of the simplest layouts in Ext JS.
+
+👉 It makes exactly one child component expand to fill the entire container — both width and height.
+
+If there’s more than one child, only the first one is displayed.
+
+It’s often used to embed a single main panel, like a grid, form, or tab panel.
+
+📌 When to use fit
+
+| Use case                                           | Why                         |
+| -------------------------------------------------- | --------------------------- |
+| Show a single component that fills the parent      | e.g., grid, form, tab panel |
+| Use it in the `center` region of a `border` layout | Common for content area     |
+| Wrap a panel around an iframe or custom content    | So it always fills          |
+
+Use Case : one Child inside fit layout
+
+Ext.application({
+    name: 'MyApp', //name of the application : this is namespace prefix
+    launch: function () {
+        Ext.create('Ext.container.Container', {
+            renderTo: Ext.getBody(),
+            layout: 'fit',
+            items: [
+                {
+                    xtype: 'panel',
+                    title: 'I fill the whole Container',
+                    html: '<p>This is Fit Layout</p>'
+                }
+            ]
+        })
+
+    }
+
+
+})
+The panel expands to fill all 400x300 pixels.
+No scroll bars unless the panel content overflows.
+
+
+Use 2: Fit inside border layout:
+
+Ext.application({
+    name: 'MyApp', //name of the application : this is namespace prefix
+    launch: function () {
+        Ext.create('Ext.container.Viewport', {
+            layout: 'border',
+            items: [
+                {
+                    region: 'north',
+                    xtype: 'panel',
+                    title: 'Header',
+                    height: 50
+                },
+                {
+                    region: 'center',
+                    xtype: 'panel',
+                    title: 'Main Content',
+                    layout: 'fit',
+                    items: [
+                        {
+                            xtype: 'tabpanel',
+                            items: [
+                                { title: 'Tab 1', html: 'Content 1' },
+                                { title: 'Tab 2', html: 'Content 2' }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        });
+
+    }
+
+
+})
+The center panel uses fit layout.
+Inside it, the tabpanel always fills all available space
+
+Use 3— What happens with multiple children?
+
+
+
+Ext.application({
+    name: 'MyApp', //name of the application : this is namespace prefix
+    launch: function () {
+        Ext.create('Ext.container.Container',{
+            layout: 'fit',
+            renderTo:Ext.getBody(),
+            width: 400,
+            height: 300,
+            items: [
+                {
+                    xtype: 'panel',
+                    title: 'First Panel',
+                    html: 'I am visible'
+                },
+                {
+                    xtype: 'panel',
+                    title: 'Second Panel',
+                    html: 'I am ignored!'
+                }
+
+            ]
+        })
+
+    }
+
+})
+✔️ Only the first child is visible and stretched.
+✔️ Any extra children are ignored by the fit layout.
+
+✅ Key Points
+✅	Explanation
+fit = one child expands to fill container	
+More than one child? Only the first is shown	
+Perfect for single grids, tabs, or embedded forms	
+Frequently used in the center region
+
+ Analogy
+Think of fit as “100% width + 100% height” for one child.
+
+fit layout = easiest way to make a child component auto-resize with its parent container.
+
+But in the output, still second panel is visible why?
+You’re absolutely right:
+In Ext JS, if you define multiple items in a container with layout: 'fit', technically all items exist, but only the first one is managed by the fit layout (which means only the first one will be resized to fit).
+
+However:
+👉 By default, Ext JS does NOT hide the other panels automatically.
+So, if the extra panels don’t have hidden: true or activeItem logic, they may overlap or show up unexpectedly.
+
+ How Ext handles it
+fit means: "stretch one child to fill the container."
+
+Other children aren’t laid out or resized, but they can still render unless you hide them yourself.
+
+Common best practice: use only one child in fit — or use a layout that supports multiple children properly (like card, vbox, or hbox).
+
+
+ How to ensure only the first is shown
+✔️ Solution 1 — Use hidden: true for others
+
+Ext.create('Ext.container.Container', {
+    renderTo: Ext.getBody(),
+    width: 400,
+    height: 200,
+    layout: 'fit',
+    items: [
+        {
+            xtype: 'panel',
+            title: 'First Panel',
+            html: 'I am visible'
+        },
+        {
+            xtype: 'panel',
+            title: 'Second Panel',
+            html: 'I should be hidden!',
+            hidden: true // hide it manually
+        }
+    ]
+});
+************************************************************************************************************************************************************
+											...........................................................................................................................................................................................
+									Card Layout
+........................................................................................................................................................................................
+What is card layout?
+card layout is used to manage multiple child components but show only one at a time.
+
+It’s like a stack of cards — only the top card is visible.
+
+Common uses:
+
+Wizards (Step 1 → Step 2)
+
+Multi-page forms
+
+Custom tab switching
+
+✅ Key features
+
+| Feature                                                   | Description |
+| --------------------------------------------------------- | ----------- |
+| Only **one child is visible** at a time                   |             |
+| You control which child is active using `setActiveItem()` |             |
+| Internally used by `tabpanel` and `window` wizards        |             |
+
+		
+Note:
+In Ext JS, bbar (bottom toolbar) is automatically available only for Panel components, not for a generic Container.
+
+
+
+Ext.application({
+    name: 'MyApp', //name of the application : this is namespace prefix
+    launch: function () {
+        Ext.create('Ext.panel.Panel', {
+            layout: 'card',
+            renderTo: Ext.getBody(),
+            width: 400,
+            height: 300,
+            itemId: 'cardContainer',
+            items: [
+                {
+                    xtype: 'panel',
+                    title: 'Card 1',
+                    html: '<h2>Welcome to Card 1</h2>'
+                },
+                {
+                    xtype: 'panel',
+                    title: 'Card 2',
+                    html: '<h2>Now you are on Card 2</h2>'
+                },
+                {
+                    xtype: 'panel',
+                    title: 'Card 3',
+                    html: '<h2>Finally, Card 3</h2>'
+                }
+            ],
+            bbar: [
+                {
+                    text: 'Card-1',
+                    handler: function (btn) {
+                        var container = btn.up('container#cardContainer')
+                        container.getLayout().setActiveItem(0)
+                    }
+                },
+                {
+                    text: 'Card-2',
+                    handler: function (btn) {
+                        var container = btn.up('container#cardContainer')
+                        container.getLayout().setActiveItem(1)
+                    }
+                },
+                {
+                    text: 'Card-3',
+                    handler: function (btn) {
+                        var container = btn.up('container#cardContainer')
+                        container.getLayout().setActiveItem(2)
+                    }
+                }
+            ]
+        })
+
+    }
+
+
+})
+✅ Key features
+Only one child is visible at a time	
+You control which child is active using setActiveItem()	
+Internally used by tabpanel and window wizards	
+
+✅ How this works
+✔️ layout: 'card' means all children stacked, but only one is shown.
+✔️ The bbar (bottom toolbar) has buttons to switch cards by index (0, 1, 2).
+✔️ setActiveItem(index) does the switching.
+
+Another version — with Next/Previous buttons:
+...........................................................................
+
+Ext.application({
+    name: 'MyApp', //name of the application : this is namespace prefix
+    launch: function () {
+        Ext.create('Ext.panel.Panel', {
+            renderTo: Ext.getBody(),
+            width: 400,
+            height: 200,
+            layout: 'card',
+            itemId: 'wizardContainer',
+            items: [
+                { html: '<h2>Step 1: Introduction</h2>' },
+                { html: '<h2>Step 2: Details</h2>' },
+                { html: '<h2>Step 3: Confirmation</h2>' }
+            ],
+
+            bbar: [
+                {
+                    text: 'Previous',
+                    handler: function (btn) {
+                        var container = btn.up('container#wizardContainer'),
+                            layout = container.getLayout(),
+                            currentIndex = layout.getActiveItem().getItemId() || layout.activeItemIndex || 0;
+
+                        // fallback if itemId is not set:
+                        var prevIndex = layout.activeItemIndex !== undefined ? layout.activeItemIndex - 1 : layout.getNext().index - 1;
+                        if (prevIndex >= 0) {
+                            layout.setActiveItem(prevIndex);
+                            layout.activeItemIndex = prevIndex;
+                        }
+                    }
+                },
+                '->',
+                {
+                    text: 'Next',
+                    handler: function (btn) {
+                        var container = btn.up('container#wizardContainer'),
+                            layout = container.getLayout(),
+                            currentIndex = layout.activeItemIndex || 0;
+                        var nextIndex = currentIndex + 1;
+
+                        if (nextIndex < container.items.length) {
+                            layout.setActiveItem(nextIndex);
+                            layout.activeItemIndex = nextIndex;
+                        }
+                    }
+                }
+            ],
+
+            listeners: {
+                afterrender: function (container) {
+                    // Track index manually for convenience
+                    container.getLayout().activeItemIndex = 0;
+                }
+            }
+        });
+
+    }
+
+
+})
+✅ Key difference from fit
+| `fit`                                      |			 `card`                                           |
+| ------------------------------------ | ------------------------------------------------ |
+| One child fills container            | Many children stacked, only one visible          |
+| Other children not hidden by default | Only active card visible, others auto hidden     |
+| Use for a single panel               | Use for wizards, multi-step forms, tab switching |
+************************************************************************************************************************************************************
+.................................................************......................................................................................................................
+								accordion
+......................................................................................................................................................................................
+
+✅ What is accordion layout?
+
+1.The accordion layout stacks multiple panels vertically.
+2.Only one panel is expanded at a time (like an accordion).
+3.When you expand a new panel, the others collapse automatically.
+4.Common for sidebars, settings menus, navigation panels.
    
+
+✅	Explanation
+Children must be Panels	
+Only one child expanded at a time	
+Automatically manages expand/collapse	
+Usually used inside a Panel with layout: 'accordion'
+
+Ext.application({
+    name: 'MyApp', //name of the application : this is namespace prefix
+    launch: function () {
+        Ext.create('Ext.panel.Panel', {
+            renderTo: Ext.getBody(),
+            title: 'Accordion Example',
+            width: 300,
+            height: 400,
+            layout: 'accordion',
+            defaults: {
+                bodyPadding: 10
+            },
+            items: [
+                {
+                    title: 'Panel 1',
+                    html: 'Content for Panel 1'
+                },
+                {
+                    title: 'Panel 2',
+                    html: 'Content for Panel 2'
+                },
+                {
+                    title: 'Panel 3',
+                    html: 'Content for Panel 3'
+                }
+            ]
+        });
+    }
+});
+
+
+✅ How it works
+✔️ The container (Panel) uses layout: 'accordion'.
+✔️ Each child must be a Panel with a title.
+✔️ Only one child stays open — click another header to switch.
+
+
+✅ Common options
+animate: true or false — smooth expand/collapse.
+activeItem: sets which panel is open by default.
+multi: (not in classic accordion, but can be mimicked) — allow multiple panels open.
+
+✅ Analogy
+accordion = a vertical stack of collapsible panels.
+
+| `card`                                          		   | `accordion`                              |
+| -------------------------------------------------- | ---------------------------------------- |
+| Only **one child visible**, fills entire container | One child **expanded**, others collapsed |
+| No multiple visible children                       | All headers always visible               |
+| Used for wizards, tabs                             | Used for menus, sidebars                 |
+.............................................**************........................................................................................................................
+									Column Layout
+.....................................................................................................................................................................................
+
+What is column layout?
+
+Column layout divides a container horizontally into columns.
+Each child item can take a percentage width using columnWidth (a value between 0 and 1).
+Good for arranging form fields, info panels, or multi-column UIs.
+Key Ideas:
+| ✅                                                                                                      | Explanation |
+| ------------------------------------------------------------------------------------------------------ | ----------- |
+| Children are laid out **left to right**, each given a percentage width                                 |             |
+| The total `columnWidth` for all children does not have to add up to exactly `1` — Ext JS normalizes it |             |
+| Each child is typically a `Panel` or `FieldContainer`                                                  |             |
+| Height is **not auto-matched** — each child controls its own height                                    |             |
+
+
+The real cause
+In Ext JS, the column layout uses CSS float: left for each child — so when you use bodyPadding on the parent Panel, the inner width is reduced by the padding, but your children still ask for 50% each of the full available width (not the padded area).
+
+So:
+
+Actual available width = width - bodyPadding * 2
+
+Each child claims 50% of width instead of width minus padding
+
+So the last column doesn’t fit → it wraps or is clipped.
+
+option 2 — Use hbox instead
+hbox handles padding and spacing properly — this is generally preferred for modern layouts.
+
+Option 3 — Adjust for padding
+If you must use column + bodyPadding:
+
+Use columnWidth slightly under 0.5 (like 0.48).
+
+Or use explicit width in pixels.
+
+Or use defaults: { style: { marginRight: '10px' } } instead of bodyPadding.
+
+
+📌 Key takeaway
+✅ Good				❌ Fragile
+hbox with flex		column with bodyPadding
+
+👉 column layout is older and can break with padding/margins — hbox is smarter for side-by-side panels.
+
+column layout works best with no inner padding.
+
+hbox works perfectly with bodyPadding.
+
+For modern layouts → prefer hbox.
+********************************************************************************************************************************************************
+								Anchor layout
+....................................................................................................................................................................................
+
+What is anchor layout?
+anchor layout is mainly used for forms and simple panels.
+
+It sizes and positions child items relative to the container’s size.
+
+Each child can use an anchor value:
+
+'100%' → 100% of container width
+
+'50%' → 50% of container width
+
+'100% 50%' → 100% width & 50% height
+
+Or pixel offsets like '-20' (20px less than container)
+
+When to use
+Common in forms: to make input fields automatically expand to container width.
+
+Simple containers that need children to stretch horizontally.
+
+How it works?
+
+| ✅                                                               | Explanation |
+| --------------------------------------------------------------- | ----------- |
+| `layout: 'anchor'` tells the container to use anchor sizing     |             |
+| Each child’s `anchor` determines its size relative to container |             |
+| `'100%'` means full width                                       |             |
+| `'50%'` means half width                                        |             |
+| `'100% 50%'` means full width, half height                      |             |
+
+✅ Tips
+✔️ anchor works great for forms — your fields auto-resize with the window.
+✔️ For more complex responsive layouts, hbox + vbox are better.
+✔️ Combine anchor + form layout for beautiful auto-sizing forms.
+
+ Use anchor layout when:
+✔️ You want children to scale with the container
+✔️ You build forms with fields that need 100% width
+✔️ You want simple relative sizing
+
+Ext.application({
+    name: 'MyApp', //name of the application : this is namespace prefix
+    launch: function () {
+        Ext.create('Ext.panel.Panel', {
+            renderTo: Ext.getBody(),
+            title: 'Anchor Layout Example',
+            width: 400,
+            height: 300,
+            layout: 'anchor',
+            bodyPadding: 10,
+            items: [
+                {
+                    xtype: 'textfield',
+                    fieldLabel: 'Name',
+                    anchor: '100%'   // takes 100% width of container
+                },
+                {
+                    xtype: 'textfield',
+                    fieldLabel: 'Email',
+                    anchor: '100%'   // also 100% width
+                },
+                {
+                    xtype: 'textarea',
+                    fieldLabel: 'Address',
+                    anchor: '100% 50%'  // 100% width, 50% height of container
+                }
+            ]
+        });
+
+    }
+})
+								Table Layout
+
+✅ What is table layout?
+It lays out child items in rows and columns, just like an HTML <table>.
+
+Each child item is placed into the next available cell.
+
+You can control how many columns there are and how wide/high each cell should be.
+
+Items can span multiple rows or columns using rowspan and colspan.
+
+✅ When to use it
+When you need a simple grid arrangement: e.g. forms, dashboards, or control panels.
+
+To position items precisely in a matrix-like layout.
+
+Good alternative to writing raw HTML tables in your markup.
+
+✅ Key config
+
+| Config                                  | What it does                                  |
+| --------------------------------------- | --------------------------------------------- |
+| `layout: { type: 'table', columns: N }` | Defines a table with `N` columns              |
+| `rowspan` / `colspan` on child items    | Makes an item span multiple rows or columns   |
+| `cellCls`                               | CSS class for styling table cells             |
+| `tdAttrs`                               | Custom HTML attributes for the `<td>` element |
+
+
+Ext.application({
+    name: 'MyApp', //name of the application : this is namespace prefix
+    launch: function () {
+        Ext.create('Ext.panel.Panel', {
+            renderTo: Ext.getBody(),
+            title: 'Table Layout Example',
+            width: 400,
+            height: 200,
+            layout: {
+                type: 'table',
+                columns:3
+            },
+            defaults: {
+                bodyPadding: 10,
+                border: 1,
+                style: 'background: #f0f0f0;'
+            },
+            items: [
+                {
+                    html: 'Cell 1'
+                },
+                {
+                    html: 'Cell 2'
+                },
+                {
+                    html: 'Cell 3'
+                },
+                {
+                    html: 'Cell 4'
+                }
+            ]
+        });
+
+
+    }
+})
+

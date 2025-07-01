@@ -323,7 +323,7 @@ eg:
 
 })
 evt - is "EventTarget"/ "Event" Object reference
-You can refere dom element reference using evt Variable
+You can refer dom element reference using evt Variable
 
 Types of Events:
 

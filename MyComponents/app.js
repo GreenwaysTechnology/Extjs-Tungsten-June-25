@@ -3,51 +3,35 @@ Ext.application({
     name: 'MyApp', //name of the application : this is namespace prefix
     launch: function () {
         Ext.create('Ext.panel.Panel', {
-            title: 'Panel with More Configuration',
-            // width: 500,
-            margin: '10 20 30 50',
-            height: 500,
-            collapsible: true,
-            collapsed: false,
-            bodyPadding: 10,
+            renderTo: Ext.getBody(),
+            title: 'Table Layout Example',
+            width: 400,
+            height: 200,
             layout: {
-                type: 'hbox',
-                align: 'stretch'
+                type: 'table',
+                columns: 4
+            },
+            defaults: {
+                bodyPadding: 10,
+                border: 1,
+                style: 'background: #f0f0f0;'
             },
             items: [
                 {
-                    xtype: 'panel',
-                    title: 'Top Panel',
-                    flex: 2,
-                    html: '1st panel'
+                    html: 'Cell 1'
                 },
                 {
-                    xtype: 'panel',
-                    title: 'Bottom Panel',
-                    margin: '2 2 2 2',
-                    bodyPadding: 5,
-                    flex: 3,
-                    html: '2st panel'
+                    html: 'Cell 2'
                 },
                 {
-                    xtype: 'panel',
-                    title: 'Bottom Panel',
-                    margin: '2 2 2 2',
-                    bodyPadding: 5,
-                    flex: 3,
-                    html: '2st panel'
+                    html: 'Cell 3'
                 },
                 {
-                    xtype: 'panel',
-                    title: 'Bottom Panel',
-                    margin: '2 2 2 2',
-                    bodyPadding: 5,
-                    flex: 3,
-                    html: '2st panel'
+                    html: 'Cell 4'
                 }
-            ],
-            renderTo: Ext.getBody() //View Port
-        })
+            ]
+        });
+
 
     }
 })

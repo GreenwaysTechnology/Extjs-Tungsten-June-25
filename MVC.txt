@@ -883,15 +883,303 @@ Ext.application({
 *********************************************************************************************************************************************************
 										 M- Model & Store(Service layer)
 *********************************************************************************************************************************************************
+What s Model?
+
+ A Model or Entity represents some object that your application manages.
+ For example, one might define a Model for Users, Products, Cars, or other real-world object that we want to model in the system.
+
+ Models are used by Ext.data.Store, which are in turn used by many of the data-bound components in Ext.
+
+📌 What is Ext.data.Model?
+
+Ext.data.Model is a class in Ext JS that represents a "structured data record" — similar to a row in a database table.
+
+It defines:
+
+1.Fields (the data structure)
+2.Validation rules
+3.Associations (relationships to other models)
+4.How the data maps to and from a backend server via a Proxy.
+
+🧩 Key features
+Feature -	 Description
+Fields  -->	Define what data the model holds (name, age, etc).
+Proxies -->	Tell the model how to load/save data (AJAX, REST, local storage, etc).
+Associations -->	Define relationships (hasMany, belongsTo).
+Validations -->	Add constraints like required fields, email format, etc.
+CRUD Operations	--> Integrates with stores for Create, Read, Update, Delete.
+**********************************************************************************************************************************************************
+//Model
+Ext.define('MyApp.model.User', {
+    extend: 'Ext.data.Model',
+    fields: [
+        'id', 'name', 'email'
+    ]
+})
+******************************************************************************************************************************************************
+										Stores
+........................................................................................................................................................................................................................................
+ Store is a powerful client-side data repository that manages collections of model instances.
+Think of it as the bridge between your data and the UI components like grids, lists, or charts.
+
+Here’s a quick breakdown of what Stores do:
+- Load and manage data: Stores fetch data from a server (via proxies) or hold static data locally.
+- Bind to UI components: They automatically update the UI when data changes.
+- Support filtering, sorting, and paging: You can easily manipulate how data is displayed.
+- Work with Models: Each Store is typically tied to a data Model that defines the structure of the data.
+
+Ext.define('MyApp.store.Users', {
+    extend: 'Ext.data.Store'
+})
+
+*
+Use case:
+ Model,Store,Controller,View:
+.................................................
+//Model
+Ext.define('MyApp.model.User', {
+    extend: 'Ext.data.Model',
+    fields: [
+        'id', 'name', 'email'
+    ]
+})
+//Declare Store
+Ext.define('MyApp.store.Users', {
+    extend: 'Ext.data.Store',
+    model: 'MyApp.model.User',
+    alias: 'store.users', // eq to itemId,xtype
+    data: [{
+        id: 1, name: 'Subramanian Murugan', email: 'sasubramanian_md@hotmail.com'
+    },
+    {
+        id: 2, name: 'Murugan P', email: 'murugan@gmail.com'
+    }]
+
+})
+//Ui binding with model
+Ext.define('MyApp.view.main.Main', {
+    extend: 'Ext.grid.Panel',
+    xtype: 'mainview',
+    store: {
+        type: 'users'
+    },
+    columns: [
+        { text: 'ID', dataIndex: 'id', width: 50 },
+        { text: 'Name', dataIndex: 'name', flex: 2 },
+        { text: 'Email', dataIndex: 'email', flex: 1 }
+    ],
+    tbar: [
+        {
+            text: 'ShowSelectedItem',
+            itemId: 'toolbarButton'
+        }
+    ]
+})
+Ext.define('MyApp.controller.UserGridController', {
+    extend: 'Ext.app.Controller',
+    init: function () {
+        this.control({
+            'mainview button#toolbarButton': {
+                click: this.onShowSelected
+            }
+        })
+    },
+    onShowSelected: function (button) {
+        var grid = button.up('grid')
+        var selected = grid.getSelectionModel().getSelection()[0];
+        if (selected) {
+            Ext.Msg.alert('Selected User', selected.get('name'))
+        }
+    }
+
+})
+
+Ext.application({
+    name: 'MyApp',
+
+    controllers: [
+        'MyApp.controller.UserGridController'
+    ],
+
+    launch: function () {
+        Ext.create('MyApp.view.main.Main', {
+            renderTo: Ext.getBody()
+        })
+    }
+});
+***********************************************************************************************************************************************************
+CURD operation:
+...........................
+
+Features:
+1.A form for creating/updating users
+2.Grid with users list
+3.Full CRUD (Create, Read, Update, Delete) operations
+4.Uses Ext JS Classic MVC, not MVVM
+
+refs:
+ 	you should use the refs config instead to access components like forms or grids from the controller.
+ In your MainController.js, define this at the class level:
+
+refs: [
+    {
+        ref: 'userForm',          // This becomes this.getUserForm()
+        selector: 'userform'      // xtype of the form component
+    },
+    {
+        ref: 'userGrid',
+        selector: 'grid#userGrid' // itemId used in grid config
+    }
+]
+How It Works
+| `ref` Name | `selector`        | Generated Getter     |
+| ---------- | ----------------- | -------------------- |
+| `userForm` | `'userform'`      | `this.getUserForm()` |
+| `userGrid` | `'grid#userGrid'` | `this.getUserGrid()` |
+
+In Controller:
+......................
+const form = this.getUserForm().getForm();
+const grid = this.getUserGrid();
 
 
+Ext.define('MyApp.model.User', {
+    extend: 'Ext.data.Model',
+    fields: ['id', 'name', 'email']
+});
+Ext.define('MyApp.store.Users', {
+    extend: 'Ext.data.Store',
+    model: 'MyApp.model.User',
+    alias: 'store.users',
+    data: [
+        { id: 1, name: 'John Doe', email: 'john@example.com' },
+        { id: 2, name: 'Jane Smith', email: 'jane@example.com' }
+    ]
+});
+Ext.define('MyApp.controller.MainController', {
+    extend: 'Ext.app.Controller',
+    refs: [
+        { ref: 'userForm', selector: 'userform' },
+        { ref: 'userGrid', selector: 'grid' }
+    ],
 
-
-
-
-
-
-
-
+    init: function () {
+        this.control({
+            'button#saveBtn': {
+                click: this.onSaveUser
+            },
+            'button#deleteBtn': {
+                click: this.onDeleteUser
+            },
+            'grid#userGrid': {
+                select: this.onUserSelect
+            }
+        });
+    },
+    onSaveUser: function () {
+        var form = this.getUserForm().getForm()
+        var values = form.getValues()
+        //store has lot of curd apis
+        var store = this.getUserGrid().getStore()
+        if (form.isValid()) {
+            if (values.id) {
+                //update logic
+                var record = store.getById(parseInt(values.id))
+                record.set(values)
+            } else {
+                //create new Model then inser into grid
+                store.add(values)
+            }
+            store.commitChanges()
+            form.reset()
+        }
+    },
+    onDeleteUser: function () {
+        var grid = this.getUserGrid()
+        var selected = grid.getSelectionModel().getSelection()[0]
+        if (selected) {
+            grid.getStore().remove(selected)
+        } else {
+            Ext.Msg.alert('Error', 'Please Select row to be deleted')
+        }
+    },
+    onUserSelect: function (grid, record) {
+        var formPanel = this.getUserForm()
+        var form = formPanel.getForm()
+        form.loadRecord(record)
+        console.log('Selected Record', record.getData())
+        formPanel.down('#saveBtn').setText('Update')
+    }
+})
+Ext.define('MyApp.view.main.UserForm', {
+    extend: 'Ext.form.Panel',
+    xtype: 'userform',
+    bodyPadding: 10,
+    defaultType: 'textfield',
+    width: 300,
+    items: [
+        { name: 'id', xtype: 'hiddenfield' },
+        { fieldLabel: 'Name', name: 'name', allowBlank: false },
+        { fieldLabel: 'Email', name: 'email', allowBlank: false, vtype: 'email' }
+    ],
+    buttons: [
+        {
+            text: 'Save',
+            itemId: 'saveBtn'
+        },
+        {
+            text: 'Reset',
+            handler: function () {
+                this.up('form').getForm().reset();
+            }
+        }
+    ]
+});
+Ext.define('MyApp.view.main.Main', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'mainview',
+    layout: 'hbox',
+    padding: 10,
+    items: [
+        {
+            xtype: 'grid',
+            reference: 'userGrid', // refered by refs inside controller
+            title: 'Users',
+            itemId: 'userGrid',
+            width: 400,
+            height: 300,
+            margin: '0 20 0 0',
+            store: {
+                type: 'users'
+            },
+            columns: [
+                { text: 'ID', dataIndex: 'id', width: 50 },
+                { text: 'Name', dataIndex: 'name', flex: 1 },
+                { text: 'Email', dataIndex: 'email', flex: 1 }
+            ],
+            selModel: 'rowmodel',
+            tbar: [
+                { text: 'Delete', itemId: 'deleteBtn' }
+            ]
+        },
+        {
+            xtype: 'userform'
+        }
+    ]
+});
+Ext.application({
+    name: 'MyMVCApp',
+    //controllers configuration: Registring controllers
+    controllers: [
+        'MyApp.controller.MainController'
+    ],
+    launch: function () {
+        Ext.create('MyApp.view.main.Main', {
+            renderTo: Ext.getBody()
+        })
+    }
+});
+************************************************************************************************************************************************************										 Store and Proxy configuration - Talking to Remote apis
+***********************************************************************************************************************************************************
 
 

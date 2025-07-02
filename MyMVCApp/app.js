@@ -1,143 +1,136 @@
-Ext.define('MyApp.view.MainView', {
-    extend: 'Ext.panel.Panel',
-    xtype: 'mainview',
-    title: 'Main View',
-    width: 400,
-    height: 200,
-    bodyPadding: 20,
-    items: [
-        {
-            xtype: 'textfield',
-            fieldLabel: 'Message to send',
-            itemId: 'msgField'
-        },
-        {
-            xtype: 'button',
-            text: 'Send to SecondView',
-            itemId: 'sendBtn',
-            margin: '10 0 0 0',
-            handler: function (btn) {
-                const view = btn.up('mainview');
-                const msg = view.down('#msgField').getValue();
-                // Fire global app-level event
-                view.fireEvent('sendToSecondView', msg);
-            }
-        },
-        {
-            xtype: 'displayfield',
-            fieldLabel: 'Reply from SecondView',
-            itemId: 'replyField',
-            margin: '20 0 0 0'
-        }
-    ],
-
+Ext.define('MyApp.model.User', {
+    extend: 'Ext.data.Model',
+    fields: ['id', 'name', 'email']
 });
-Ext.define('MyApp.view.SecondView', {
-    extend: 'Ext.panel.Panel',
-    xtype: 'secondview',
-
-    title: 'Second View',
-    width: 400,
-    height: 200,
-    bodyPadding: 20,
-    margin: '20 0 0 0',
-
-    items: [
-        {
-            xtype: 'displayfield',
-            fieldLabel: 'Received message',
-            itemId: 'receivedField'
-        },
-        {
-            xtype: 'button',
-            text: 'Reply to MainView',
-            itemId: 'replyBtn',
-            margin: '10 0 0 0',
-            handler: function (btn) {
-                const view = btn.up('secondview');
-                const value = view.down('#receivedField').getValue();
-
-                view.fireEvent('replyToMainView', 'Got it: "' + value + '"');
-            }
-        }
-    ],
-
+Ext.define('MyApp.store.Users', {
+    extend: 'Ext.data.Store',
+    model: 'MyApp.model.User',
+    alias: 'store.users',
+    data: [
+        { id: 1, name: 'John Doe', email: 'john@example.com' },
+        { id: 2, name: 'Jane Smith', email: 'jane@example.com' }
+    ]
 });
 Ext.define('MyApp.controller.MainController', {
     extend: 'Ext.app.Controller',
+    refs: [
+        { ref: 'userForm', selector: 'userform' },
+        { ref: 'userGrid', selector: 'grid' }
+    ],
 
-    //life cycle methods : init, onLaunch
-    //init : 
-    // is called before views are created(Before elements creation)
-    // setup app-level logic, control bindings(this.control)
-    // you cant access any dom elements
-    // used to setup this.control, app.on
-    
     init: function () {
-        //Get the Application Object through which you send events
-        var app = this.getApplication();
-        console.log(app)
-        // Listen to custom app-level events
-        //app.on('nameoftheCustomeEvent',listener,this)
-        app.on('sendToSecondView', this.onSendToSecondView, this);
-        app.on('replyToMainView', this.onReplyToMainView, this);
+        this.control({
+            'button#saveBtn': {
+                click: this.onSaveUser
+            },
+            'button#deleteBtn': {
+                click: this.onDeleteUser
+            },
+            'grid#userGrid': {
+                select: this.onUserSelect
+            }
+        });
     },
-
-    //Life cycle method, gets called after Views are created and renderd: UI is ready
-    
-    onLaunch: function () {
-        // Bridge view-level custom events to app-level
-        var mainView = Ext.ComponentQuery.query('mainview')[0];
-        var secondView = Ext.ComponentQuery.query('secondview')[0];
-
-        if (mainView) {
-            mainView.on('sendToSecondView', function (msg) {
-                this.getApplication().fireEvent('sendToSecondView', msg);
-            }, this);
-        }
-
-        if (secondView) {
-            secondView.on('replyToMainView', function (reply) {
-                this.getApplication().fireEvent('replyToMainView', reply);
-            }, this);
-        }
-    },
-
-    //msg will have value which has been broadcasted from first view
-    onSendToSecondView: function (msg) {
-        const secondView = Ext.ComponentQuery.query('secondview')[0];
-        if (secondView) {
-            secondView.down('#receivedField').setValue(msg);
-            Ext.Msg.alert('Sent', 'Message sent to SecondView.');
+    onSaveUser: function () {
+        var form = this.getUserForm().getForm()
+        var values = form.getValues()
+        //store has lot of curd apis
+        var store = this.getUserGrid().getStore()
+        if (form.isValid()) {
+            if (values.id) {
+                //update logic
+                var record = store.getById(parseInt(values.id))
+                record.set(values)
+            } else {
+                //create new Model then inser into grid
+                store.add(values)
+            }
+            store.commitChanges()
+            form.reset()
         }
     },
-
-    onReplyToMainView: function (reply) {
-        const mainView = Ext.ComponentQuery.query('mainview')[0];
-        if (mainView) {
-            mainView.down('#replyField').setValue(reply);
-            Ext.Msg.alert('Reply', 'Reply sent back to MainView.');
+    onDeleteUser: function () {
+        var grid = this.getUserGrid()
+        var selected = grid.getSelectionModel().getSelection()[0]
+        if (selected) {
+            grid.getStore().remove(selected)
+        } else {
+            Ext.Msg.alert('Error', 'Please Select row to be deleted')
         }
+    },
+    onUserSelect: function (grid, record) {
+        var formPanel = this.getUserForm()
+        var form = formPanel.getForm()
+        form.loadRecord(record)
+        console.log('Selected Record', record.getData())
+        formPanel.down('#saveBtn').setText('Update')
     }
+})
+Ext.define('MyApp.view.main.UserForm', {
+    extend: 'Ext.form.Panel',
+    xtype: 'userform',
+    bodyPadding: 10,
+    defaultType: 'textfield',
+    width: 300,
+    items: [
+        { name: 'id', xtype: 'hiddenfield' },
+        { fieldLabel: 'Name', name: 'name', allowBlank: false },
+        { fieldLabel: 'Email', name: 'email', allowBlank: false, vtype: 'email' }
+    ],
+    buttons: [
+        {
+            text: 'Save',
+            itemId: 'saveBtn'
+        },
+        {
+            text: 'Reset',
+            handler: function () {
+                this.up('form').getForm().reset();
+            }
+        }
+    ]
+});
+Ext.define('MyApp.view.main.Main', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'mainview',
+    layout: 'hbox',
+    padding: 10,
+    items: [
+        {
+            xtype: 'grid',
+            reference: 'userGrid', // refered by refs inside controller
+            title: 'Users',
+            itemId: 'userGrid',
+            width: 400,
+            height: 300,
+            margin: '0 20 0 0',
+            store: {
+                type: 'users'
+            },
+            columns: [
+                { text: 'ID', dataIndex: 'id', width: 50 },
+                { text: 'Name', dataIndex: 'name', flex: 1 },
+                { text: 'Email', dataIndex: 'email', flex: 1 }
+            ],
+            selModel: 'rowmodel',
+            tbar: [
+                { text: 'Delete', itemId: 'deleteBtn' }
+            ]
+        },
+        {
+            xtype: 'userform'
+        }
+    ]
 });
 Ext.application({
-    name: 'MyApp',
-
+    name: 'MyMVCApp',
+    //controllers configuration: Registring controllers
     controllers: [
         'MyApp.controller.MainController'
     ],
-
     launch: function () {
-        Ext.create('Ext.container.Container', {
-            renderTo: Ext.getBody(),
-            layout: {
-                type: 'vbox',
-                align: 'center'
-            },
-            items: [
-                { xtype: 'mainview' },
-                { xtype: 'secondview' }
-            ]
-        });
+        Ext.create('MyApp.view.main.Main', {
+            renderTo: Ext.getBody()
+        })
     }
 });

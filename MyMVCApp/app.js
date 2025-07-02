@@ -1,86 +1,143 @@
-//Declare controller
-Ext.define('MyApp.controller.MainController', {
-    extend: 'Ext.app.Controller',
-    //override init function:
-    init: function () {
-        console.log('Init is called for initalizing something')
-        //UI binding with this controller
-        this.control({
-            'mainview button#myButton': {
-                click: this.onButtonClick
-            }
-        })
-        //btn.addEventListener('click',function(btn){})
-    },
-    //biz logic
-    onButtonClick: function (btn) {
-        var panel = btn.up('mainview')
-        var textfield = panel.down('#myTextField')
-        var value = textfield.getValue()
-        //validation logic
-        if (!textfield.isValid()) {
-            return;
-        }
-        //write code to submitt data to server
-        Ext.Msg.alert('Info', value)
-
-    }
-})
-
-//Declare View
-Ext.define('MyApp.view.Main', {
+Ext.define('MyApp.view.MainView', {
     extend: 'Ext.panel.Panel',
     xtype: 'mainview',
-    title: 'Classic Controller',
-    margin: 50,
-    width: 600,
-    layout: 'anchor',
+    title: 'Main View',
+    width: 400,
     height: 200,
+    bodyPadding: 20,
     items: [
         {
             xtype: 'textfield',
-            itemId: 'myTextField',
-            anchor: '100%',
-            fieldLabel: 'Enter Name',
-            emptyText:'Enter Your Name',
-            //validation properties
-            allowBlank: false,
-            minLength: 3,                   // Minimum 3 chars
-            maxLength: 20,
-            msgTarget: 'under',                // Max 20 chars
-            regex: /^[a-zA-Z]+$/,           // Only letters
-            regexText: 'Only letters allowed', // Custom error text
-            //Validation Rule
-            validator: function (value) {
-                if (!value) return 'This field is required';
-                const pattern = /^[A-Z][a-z]*$/; // Must start with capital, followed by lowercase
-
-                if (!pattern.test(value)) {
-                    return 'Name must start with a capital letter and contain only lowercase letters after';
-                }
-
-                return true;
-            }
+            fieldLabel: 'Message to send',
+            itemId: 'msgField'
         },
         {
             xtype: 'button',
-            margin: '50 20 20 10 ',
-            anchor: '100%',
-            text: 'Click',
-            itemId: 'myButton'
+            text: 'Send to SecondView',
+            itemId: 'sendBtn',
+            margin: '10 0 0 0',
+            handler: function (btn) {
+                const view = btn.up('mainview');
+                const msg = view.down('#msgField').getValue();
+                // Fire global app-level event
+                view.fireEvent('sendToSecondView', msg);
+            }
+        },
+        {
+            xtype: 'displayfield',
+            fieldLabel: 'Reply from SecondView',
+            itemId: 'replyField',
+            margin: '20 0 0 0'
         }
-    ]
-})
+    ],
 
+});
+Ext.define('MyApp.view.SecondView', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'secondview',
+
+    title: 'Second View',
+    width: 400,
+    height: 200,
+    bodyPadding: 20,
+    margin: '20 0 0 0',
+
+    items: [
+        {
+            xtype: 'displayfield',
+            fieldLabel: 'Received message',
+            itemId: 'receivedField'
+        },
+        {
+            xtype: 'button',
+            text: 'Reply to MainView',
+            itemId: 'replyBtn',
+            margin: '10 0 0 0',
+            handler: function (btn) {
+                const view = btn.up('secondview');
+                const value = view.down('#receivedField').getValue();
+
+                view.fireEvent('replyToMainView', 'Got it: "' + value + '"');
+            }
+        }
+    ],
+
+});
+Ext.define('MyApp.controller.MainController', {
+    extend: 'Ext.app.Controller',
+
+    //life cycle methods : init, onLaunch
+    //init : 
+    // is called before views are created(Before elements creation)
+    // setup app-level logic, control bindings(this.control)
+    // you cant access any dom elements
+    // used to setup this.control, app.on
+    
+    init: function () {
+        //Get the Application Object through which you send events
+        var app = this.getApplication();
+        console.log(app)
+        // Listen to custom app-level events
+        //app.on('nameoftheCustomeEvent',listener,this)
+        app.on('sendToSecondView', this.onSendToSecondView, this);
+        app.on('replyToMainView', this.onReplyToMainView, this);
+    },
+
+    //Life cycle method, gets called after Views are created and renderd: UI is ready
+    
+    onLaunch: function () {
+        // Bridge view-level custom events to app-level
+        var mainView = Ext.ComponentQuery.query('mainview')[0];
+        var secondView = Ext.ComponentQuery.query('secondview')[0];
+
+        if (mainView) {
+            mainView.on('sendToSecondView', function (msg) {
+                this.getApplication().fireEvent('sendToSecondView', msg);
+            }, this);
+        }
+
+        if (secondView) {
+            secondView.on('replyToMainView', function (reply) {
+                this.getApplication().fireEvent('replyToMainView', reply);
+            }, this);
+        }
+    },
+
+    //msg will have value which has been broadcasted from first view
+    onSendToSecondView: function (msg) {
+        const secondView = Ext.ComponentQuery.query('secondview')[0];
+        if (secondView) {
+            secondView.down('#receivedField').setValue(msg);
+            Ext.Msg.alert('Sent', 'Message sent to SecondView.');
+        }
+    },
+
+    onReplyToMainView: function (reply) {
+        const mainView = Ext.ComponentQuery.query('mainview')[0];
+        if (mainView) {
+            mainView.down('#replyField').setValue(reply);
+            Ext.Msg.alert('Reply', 'Reply sent back to MainView.');
+        }
+    }
+});
 Ext.application({
-    name: 'MyMVCApp',
-    //controllers configuration: Registring controllers
+    name: 'MyApp',
+
     controllers: [
         'MyApp.controller.MainController'
     ],
+
     launch: function () {
-        Ext.create('MyApp.view.Main', {
-            renderTo: Ext.getBody()
-        })
+        Ext.create('Ext.container.Container', {
+            renderTo: Ext.getBody(),
+            layout: {
+                type: 'vbox',
+                align: 'center'
+            },
+            items: [
+                { xtype: 'mainview' },
+                { xtype: 'secondview' }
+            ]
+        });
     }
 });

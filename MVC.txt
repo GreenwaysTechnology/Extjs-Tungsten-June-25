@@ -491,3 +491,407 @@ Ext.application({
     }
 });
 ***********************************************************************************************************************************************************
+									 Sharing controller across multiple Views
+
+
+Classic controller code can be shared across the multiple views
+
+
+//Declare controller
+Ext.define('MyApp.controller.MainController', {
+    extend: 'Ext.app.Controller',
+    //override init function:
+    init: function () {
+        console.log('Init is called for initalizing something')
+        //UI binding with this controller
+        this.control({
+            'mainview button#helloButton': {
+                click: this.onHelloClick
+            },
+            'mainview button#greetButton': {
+                click: this.onGreeterClick
+            },
+        });
+        //btn.addEventListener('click',function(btn){})
+    },
+    //biz logic
+    onHelloClick: function () {
+        Ext.Msg.alert('Message', 'Hello there!');
+    },
+
+    onGreeterClick: function () {
+        Ext.Msg.alert('Message', 'Goodbye!');
+    }
+})
+Ext.define('MyApp.view.hello.HelloView', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'helloview',
+    title: 'Hello View',
+    layout: 'fit',
+    items: [{
+        xtype: 'button',
+        text: 'Hello',
+        itemId: 'helloButton'
+    }]
+})
+Ext.define('MyApp.view.greet.GreeterView', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'greeterview',
+    title: 'Greeter View',
+    items: [{
+        xtype: 'button',
+        text: 'Greet',
+        itemId: 'greetButton'
+    }]
+})
+//Declare View
+Ext.define('MyApp.view.Main', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'mainview',
+    title: 'Classic Controller',
+    margin: 50,
+    width: 600,
+    layout: 'anchor',
+    height: 500,
+    items: [
+        {
+            xtype: 'button',
+            text: 'Say Hello',
+            itemId: 'helloButton',
+            margin: '0 0 10 0'
+        },
+        {
+            xtype: 'button',
+            text: 'Greet',
+            itemId: 'greetButton',
+            margin: '0 0 10 0'
+        },
+        {
+            xtype: 'helloview'
+        },
+        {
+            xtype: 'greeterview'
+        }
+
+    ]
+
+})
+
+Ext.application({
+    name: 'MyMVCApp',
+    //controllers configuration: Registring controllers
+    controllers: [
+        'MyApp.controller.MainController'
+    ],
+    launch: function () {
+        Ext.create('MyApp.view.Main', {
+            renderTo: Ext.getBody()
+        });
+    }
+});
+**********************************************************************************************************************************************************
+											Sharing data among/between Views
+**********************************************************************************************************************************************************
+Sharing data between or among views can be done in two ways
+
+Direct Way of passing data
+1.Parent to Child
+2.Child to Parent
+
+Drawbacks:
+ Two components are tightly coupled.
+
+✅ Two views: MainView and SecondView
+✅ Pass data from MainView → SecondView
+✅ Pass data back from SecondView → MainView
+✅ Using one classic controller and Ext.ComponentQuery
+
+✅ Scenario
+MainView has:
+
+A TextField to enter a message
+A Button to send the message to SecondView
+
+SecondView has:
+A DisplayField to show the received message
+A Button to send a response back to MainView (it updates a label in MainView)
+
+Ext.define('MyApp.view.MainView', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'mainview',
+    title: 'Main View',
+    width: 400,
+    height: 200,
+    bodyPadding: 20,
+    items: [
+        {
+            xtype: 'textfield',
+            fieldLabel: 'Message to send',
+            itemId: 'msgField'
+        },
+        {
+            xtype: 'button',
+            text: 'Send to SecondView',
+            itemId: 'sendBtn',
+            margin: '10 0 0 0'
+        },
+        {
+            xtype: 'displayfield',
+            fieldLabel: 'Reply from SecondView',
+            itemId: 'replyField',
+            margin: '20 0 0 0'
+        }
+    ]
+});
+Ext.define('MyApp.view.SecondView', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'secondview',
+    title: 'Second View',
+    width: 400,
+    height: 200,
+    bodyPadding: 20,
+    margin: '20 0 0 0',
+
+    items: [
+        {
+            xtype: 'displayfield',
+            fieldLabel: 'Received message',
+            itemId: 'receivedField'
+        },
+        {
+            xtype: 'button',
+            text: 'Reply to MainView',
+            itemId: 'replyBtn',
+            margin: '10 0 0 0'
+        }
+    ]
+});
+Ext.define('MyApp.controller.MainController', {
+    extend: 'Ext.app.Controller',
+
+    init: function () {
+        this.control({
+            'mainview button#sendBtn': {
+                click: this.onSendClick
+            },
+            'secondview button#replyBtn': {
+                click: this.onReplyClick
+            }
+        });
+    },
+
+    onSendClick: function () {
+        var mainView = Ext.ComponentQuery.query('mainview')[0]
+        var secondView = Ext.ComponentQuery.query('secondview')[0];
+
+        if (mainView && secondView) {
+            var msg = mainView.down('#msgField').getValue();
+            secondView.down('#receivedField').setValue(msg);
+
+            Ext.Msg.alert('Sent', 'Message sent to SecondView.');
+        }
+    },
+
+    onReplyClick: function () {
+        var secondView = Ext.ComponentQuery.query('secondview')[0]
+        var   mainView = Ext.ComponentQuery.query('mainview')[0];
+
+        if (secondView && mainView) {
+            var reply = 'Got it: "' + secondView.down('#receivedField').getValue() + '"';
+            mainView.down('#replyField').setValue(reply);
+            Ext.Msg.alert('Reply', 'Reply sent back to MainView.');
+        }
+    }
+});
+Ext.application({
+    name: 'MyApp',
+
+    controllers: [
+        'MainController'
+    ],
+
+    launch: function () {
+        Ext.create('Ext.panel.Panel', {
+            renderTo: Ext.getBody(),
+            title:'containerView',
+            layout: {
+                type: 'vbox',
+                align: 'center'
+            },
+            items: [
+                { xtype: 'mainview' },
+                { xtype: 'secondview' }
+            ]
+        });
+    }
+});
+........................................................................................................................................................................................................................................
+											Event Bus
+						cross-view communication using an Event Bus in Classic MVC.
+**********************************************************************************************************************************************************
+In Ext JS, you can use fireEvent and listen on components, or use the application itself as a central event bus — that’s a very clean pattern for decoupled communication.
+
+✅ Event Bus version — Overview
+MainView fires a custom event (e.g., 'sendToSecondView') with data.
+SecondView listens for this event via the controller and updates itself.
+SecondView fires a custom event ('replyToMainView') back.
+MainView listens via the controller and updates itself.
+All orchestrated through one controller using the App as Event Bus (this.getApplication()).
+Ext.define('MyApp.view.MainView', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'mainview',
+    title: 'Main View',
+    width: 400,
+    height: 200,
+    bodyPadding: 20,
+    items: [
+        {
+            xtype: 'textfield',
+            fieldLabel: 'Message to send',
+            itemId: 'msgField'
+        },
+        {
+            xtype: 'button',
+            text: 'Send to SecondView',
+            itemId: 'sendBtn',
+            margin: '10 0 0 0',
+            handler: function (btn) {
+                const view = btn.up('mainview');
+                const msg = view.down('#msgField').getValue();
+                // Fire global app-level event
+                view.fireEvent('sendToSecondView', msg);
+            }
+        },
+        {
+            xtype: 'displayfield',
+            fieldLabel: 'Reply from SecondView',
+            itemId: 'replyField',
+            margin: '20 0 0 0'
+        }
+    ],
+
+});
+Ext.define('MyApp.view.SecondView', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'secondview',
+
+    title: 'Second View',
+    width: 400,
+    height: 200,
+    bodyPadding: 20,
+    margin: '20 0 0 0',
+
+    items: [
+        {
+            xtype: 'displayfield',
+            fieldLabel: 'Received message',
+            itemId: 'receivedField'
+        },
+        {
+            xtype: 'button',
+            text: 'Reply to MainView',
+            itemId: 'replyBtn',
+            margin: '10 0 0 0',
+            handler: function (btn) {
+                const view = btn.up('secondview');
+                const value = view.down('#receivedField').getValue();
+
+                view.fireEvent('replyToMainView', 'Got it: "' + value + '"');
+            }
+        }
+    ],
+
+});
+Ext.define('MyApp.controller.MainController', {
+    extend: 'Ext.app.Controller',
+
+    //life cycle methods : init, onLaunch
+    //init : 
+    // is called before views are created(Before elements creation)
+    // setup app-level logic, control bindings(this.control)
+    // you cant access any dom elements
+    // used to setup this.control, app.on
+    
+    init: function () {
+        //Get the Application Object through which you send events
+        var app = this.getApplication();
+        console.log(app)
+        // Listen to custom app-level events
+        //app.on('nameoftheCustomeEvent',listener,this)
+        app.on('sendToSecondView', this.onSendToSecondView, this);
+        app.on('replyToMainView', this.onReplyToMainView, this);
+    },
+
+    //Life cycle method, gets called after Views are created and renderd: UI is ready
+    
+    onLaunch: function () {
+        // Bridge view-level custom events to app-level
+        var mainView = Ext.ComponentQuery.query('mainview')[0];
+        var secondView = Ext.ComponentQuery.query('secondview')[0];
+
+        if (mainView) {
+            mainView.on('sendToSecondView', function (msg) {
+                this.getApplication().fireEvent('sendToSecondView', msg);
+            }, this);
+        }
+
+        if (secondView) {
+            secondView.on('replyToMainView', function (reply) {
+                this.getApplication().fireEvent('replyToMainView', reply);
+            }, this);
+        }
+    },
+
+    //msg will have value which has been broadcasted from first view
+    onSendToSecondView: function (msg) {
+        const secondView = Ext.ComponentQuery.query('secondview')[0];
+        if (secondView) {
+            secondView.down('#receivedField').setValue(msg);
+            Ext.Msg.alert('Sent', 'Message sent to SecondView.');
+        }
+    },
+
+    onReplyToMainView: function (reply) {
+        const mainView = Ext.ComponentQuery.query('mainview')[0];
+        if (mainView) {
+            mainView.down('#replyField').setValue(reply);
+            Ext.Msg.alert('Reply', 'Reply sent back to MainView.');
+        }
+    }
+});
+Ext.application({
+    name: 'MyApp',
+
+    controllers: [
+        'MyApp.controller.MainController'
+    ],
+
+    launch: function () {
+        Ext.create('Ext.container.Container', {
+            renderTo: Ext.getBody(),
+            layout: {
+                type: 'vbox',
+                align: 'center'
+            },
+            items: [
+                { xtype: 'mainview' },
+                { xtype: 'secondview' }
+            ]
+        });
+    }
+});
+*********************************************************************************************************************************************************
+										 M- Model & Store(Service layer)
+*********************************************************************************************************************************************************
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,383 @@
+									    			  MVVM 
+************************************************************************************************************************************************************
+
+What is MVVM in Ext JS?
+
+         MVVM stands for **Model-View-ViewModel** — it’s an architectural pattern used in Ext JS (starting prominently from Ext JS 5) to better separate UI logic, data, and business logic, making large applications easier to maintain and scale.
+
+## ⚙️ **MVVM Components in Ext JS**
+
+| Part                      | Description                                                                                                                                                            |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Model**                 | Represents the data structure, business logic, and data interaction (like a record for an entity).                                                                     |
+| **View**                  | The UI components — Panels, Grids, Forms — anything the user interacts with.                                                                                           |
+| **ViewModel**             | A special object that acts as a **data binder** — it holds data and state for the View. The View automatically updates when the ViewModel data changes and vice versa. 
+
+| **Controller** (optional) | Handles user interaction logic that can’t be handled by binding alone (like complex event handling).   
+
+
+
+## 🔑 **How it works in Ext JS**
+
+1️⃣ **View** declares **data bindings** and commands (like `bind: { title: '{title}' }`).
+2️⃣ **ViewModel** holds **data** and **formulas** (computed properties).
+3️⃣ **Model** is the structured data record (from server/API).
+4️⃣ Changes to View → auto-update ViewModel → auto-update Model (with explicit saving).
+5️⃣ Changes to Model → auto-update ViewModel → auto-update View.
+
+Basic ViewModel Object declaration:
+
+Ext.define('MyApp.view.HelloModel', {
+    extend: 'Ext.app.ViewModel',
+    data: {
+        message: 'Hello'
+    }
+})
+
+Binding with UI:
+//View Model
+Ext.define('MyApp.view.HelloModel', {
+    extend: 'Ext.app.ViewModel',
+    alias: 'viewmodel.hello', // this would be refered by the view 
+    data: {
+        message: 'Hello',
+        name:'Subramanian'
+    }
+})
+//View
+Ext.define('MyApp.view.HelloView', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'helloView',
+    title: 'ViewModel Example',
+    //linking
+    viewModel: {
+        type: 'hello'
+    },
+    items: [
+        {
+            xtype: 'displayfield',
+            fieldLabel: 'Greeting',
+            bind:'{message} {name} '
+        }
+    ]
+})
+
+Ext.application({
+    name: 'MyApp',
+    launch: function () {
+        Ext.create('MyApp.view.HelloView', {
+            renderTo: Ext.getBody()
+        })
+    }
+});
+*******************************************************************************************************************************************************
+												Computed Properties
+											  		(Formulas)
+
+Formulas is function which does some logic(computation), that logic result if you want to bind in UI       
+
+//View Model
+Ext.define('MyApp.view.HelloModel', {
+    extend: 'Ext.app.ViewModel',
+    alias: 'viewmodel.hello', // this would be refered by the view 
+    data: {
+        message: 'Hello',
+        name: 'Subramanian'
+    },
+    formulas: {
+        greeting: function (get) {
+            return `${get('message')} ${get('name')}`
+        }
+    }
+})
+//View
+Ext.define('MyApp.view.HelloView', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'helloView',
+    title: 'ViewModel Example',
+    //linking
+    viewModel: {
+        type: 'hello'
+    },
+    items: [
+        {
+            xtype: 'displayfield',
+            fieldLabel: 'Greeting',
+            bind: '{message} {name} '
+        },
+        {
+            xtype: 'displayfield',
+            fieldLabel: 'Greeting',
+            bind: '{greeting}'
+        }
+    ]
+})
+
+Ext.application({
+    name: 'MyApp',
+    launch: function () {
+        Ext.create('MyApp.view.HelloView', {
+            renderTo: Ext.getBody()
+        })
+    }
+});
+************************************************************************************************************************************************************
+										  Two way data binding
+***********************************************************************************************************************************************************
+ //View Model
+Ext.define('MyApp.view.HelloModel', {
+    extend: 'Ext.app.ViewModel',
+    alias: 'viewmodel.hello', // this would be refered by the view 
+    data: {
+        name: 'Subramanian'
+    },
+    formulas: {
+        greeting: function (get) {
+            return `Hello ${get('name')}`
+        }
+    }
+})
+//View
+Ext.define('MyApp.view.HelloView', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'helloView',
+    title: 'ViewModel Example',
+    //linking
+    viewModel: {
+        type: 'hello'
+    },
+    items: [
+        {
+            xtype: 'textfield',
+            fieldLabel: 'Name',
+            bind: '{name}' // attach internall listener,update dom element
+        },
+        {
+            xtype: 'displayfield',
+            fieldLabel: 'Greeting',
+            bind: '{greeting}'
+        }
+    ]
+})
+
+Ext.application({
+    name: 'MyApp',
+    launch: function () {
+        Ext.create('MyApp.view.HelloView', {
+            renderTo: Ext.getBody()
+        })
+    }
+});
+
+**How it works:**
+
+* The `textfield` edits `name` in the ViewModel.
+* The `displayfield` shows the `greeting` formula, which updates live as you type.
+
+---
+
+## 🎯 **Benefits of MVVM in Ext JS**
+
+✅ Clear separation of concerns
+✅ Declarative data binding
+✅ Less manual DOM handling
+✅ Easier testing
+✅ More maintainable large apps
+👉 2️⃣ For ViewModels (type)
+When you define a ViewModel, you give it an alias with the prefix viewmodel. —
+this is used in the viewModel config of a View.
+
+Ext.define('MyApp.view.main.MainModel', {
+    extend: 'Ext.app.ViewModel',
+    alias: 'viewmodel.main'  // makes 'type: main'
+
+    // data, formulas...
+});
+
+// In your view:
+viewModel: {
+    type: 'main' // uses the alias
+}
+
+🎯 Why use alias?
+✅ Shorter & cleaner configs (like xtype instead of full class path)
+✅ Easy reuse
+✅ Makes UI configs declarative and readable
+✅ Automatic class resolution by Ext JS
+**********************************************************************************************************************************************************
+								  Complex View Model 
+**********************************************************************************************************************************************************
+
+✅ Multiple child views
+✅ Shared ViewModel data
+✅ Bindings across nested views
+✅ A small controller to handle an action
+
+Ext.define('MyApp.view.UserModel', {
+    extend: 'Ext.app.ViewModel',
+    alias: 'viewmodel.user',
+    data: {
+        user: {
+            name: 'xx',
+            email: 'xxx'
+        }
+    }
+});
+
+Ext.define('MyApp.view.main.MainController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.maincontroller', //controller.AnyName - reference Name
+    onShowDetails: function (btn) {
+        // Get the form
+        var form = btn.up('form');
+        // Get the field values
+        var values = form.getValues();
+        // Update ViewModel explicitly
+        this.getViewModel().set('user', {
+            name: values.name,
+            email: values.email
+        });
+    }
+})
+
+Ext.define('MyApp.view.user.Form', {
+    extend: 'Ext.form.Panel',
+    xtype: 'userform',
+    title: 'User Form',
+    controller: 'maincontroller',
+    // viewModel: {
+    //     type:""
+    // },
+    bodyPadding: 10,
+    width: 700,
+    items: [
+        {
+            xtype: 'textfield',
+            fieldLabel: 'Name',
+            name: 'name',
+            bind: '{user.name}'
+        },
+        {
+            xtype: 'textfield',
+            fieldLabel: 'Email',
+            name: 'email',
+            bind: '{user.email}'
+        }
+    ],
+    buttons: [
+        {
+            text: 'Show Details',
+            handler: 'onShowDetails'
+        },
+        {
+            text: 'Reset',
+            // handler: 'onResetUser'
+        }
+    ]
+});
+
+
+
+Ext.define('MyApp.view.user.Details', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'userdetails',
+
+    title: 'User Details',
+    bodyPadding: 10,
+    width: 250,
+
+    //template : XTemplate dervied from frameworks : Handlebars,Mustache
+    tpl: [
+        '<p><strong>Name:</strong> {name}</p>',
+        '<p><strong>Email:</strong> {email}</p>'
+    ],
+    bind: {
+        data: '{user}'
+    }
+});
+Ext.define('MyApp.view.main.Main', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'app-main',
+    //
+    viewModel: {
+        type: 'user'
+    },
+    layout: 'hbox',
+    padding: 20,
+    items: [
+        {
+            xtype: 'userform',
+            margin: '0 20 0 0'
+        },
+        {
+            xtype: 'userdetails'
+        }
+    ]
+});
+
+Ext.application({
+    name: 'MyApp',
+
+    launch: function () {
+        Ext.create('MyApp.view.main.Main', {
+            renderTo: Ext.getBody()
+        })
+    }
+});
+************************************************************************************************************************************************************
+									Model,ViewModel,View,ViewController
+***********************************************************************************************************************************************************
+Ext.define('MyApp.model.User', {
+    extend: 'Ext.data.Model',
+    fields: ['id', 'name', 'email']
+});
+Ext.define('MyApp.store.Users', {
+    extend: 'Ext.data.Store',
+    alias: 'store.users',
+    model: 'MyApp.model.User',
+    autoLoad: true,
+    proxy: {
+        type: 'rest',
+        url: 'https://jsonplaceholder.typicode.com/users',
+        reader: {
+            type: 'json',
+        }
+    }
+});
+Ext.define('MyApp.view.main.UserModel', {
+    extend: 'Ext.app.ViewModel',
+    alias: 'viewmodel.user',
+    //Transfer data from the store into Model so that ui can easily bind data
+    stores: {
+        users: {
+            type: 'users' // refers to the store alias
+        }
+    }
+});
+Ext.define('MyApp.view.main.Main', {
+    extend: 'Ext.grid.Panel',
+    xtype: 'usergrid',
+    //controller:'',
+    viewModel: {
+        type: 'user'
+    },
+    bind: {
+        store: '{users}'
+    },
+    columns: [
+        { text: 'ID', dataIndex: 'id' },
+        { text: 'Name', dataIndex: 'name' },
+        { text: 'Email', dataIndex: 'email' }
+    ]
+});
+
+
+Ext.application({
+    name: 'MyApp',
+    launch: function () {
+        Ext.create('MyApp.view.main.Main', {
+            renderTo: Ext.getBody()
+        });
+    }
+});
+

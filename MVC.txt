@@ -732,11 +732,13 @@ Ext.application({
 In Ext JS, you can use fireEvent and listen on components, or use the application itself as a central event bus — that’s a very clean pattern for decoupled communication.
 
 ✅ Event Bus version — Overview
+
 MainView fires a custom event (e.g., 'sendToSecondView') with data.
 SecondView listens for this event via the controller and updates itself.
 SecondView fires a custom event ('replyToMainView') back.
 MainView listens via the controller and updates itself.
 All orchestrated through one controller using the App as Event Bus (this.getApplication()).
+
 Ext.define('MyApp.view.MainView', {
     extend: 'Ext.panel.Panel',
     xtype: 'mainview',
@@ -1181,5 +1183,306 @@ Ext.application({
 });
 ************************************************************************************************************************************************************										 Store and Proxy configuration - Talking to Remote apis
 ***********************************************************************************************************************************************************
+Store uses a proxy to communicate with server side resources(REST,AJAX,JSON).
+The proxy configuration determines how the store loads and saves data.
 
+Types of Proxy:
+1.ajax - For general ajax requests
+2.rest - For rest full apis (GET ,POST, PUT, Delete)
+3.jsonp - for cross domain requests
+4.memory - For client side data (no back end server)
+
+Proxy configuration can be configured in two places
+
+1.Inside store
+2.Inside model
+
+REST As backend:
+................................
+
+Use Case Remote Rest Service:
+......................................................
+
+We are going to mock server rest servers, you can change your back end api servers.
+
+Use Case : Get Data From the api:
+//Model
+Ext.define('MyApp.model.User', {
+    extend: 'Ext.data.Model',
+    fields: ['id', 'name', 'email']
+})
+//store
+Ext.define('MyApp.store.Users', {
+    extend: 'Ext.data.Store',
+    alias: 'store.users',
+    model: 'MyApp.model.User',
+    autoLoad: true,
+    proxy: {
+        //rest api configuration
+        type: 'rest',
+        url: 'https://jsonplaceholder.typicode.com/users',
+        reader: {
+            type: 'json'
+        },
+        writer: {
+            type: 'json',
+            writeAllFields: true
+        }
+    }
+})
+Ext.define('MyApp.view.main.Main', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'mainview',
+    layout: 'hbox',
+    padding: 10,
+    items: [
+        {
+            xtype: 'grid',
+            title: 'Users',
+            itemId: 'userGrid',
+            width: 400,
+            height: 300,
+            margin: '0 20 0 0',
+            store: {
+                type: 'users'
+            },
+            columns: [
+                { text: 'ID', dataIndex: 'id', width: 50 },
+                { text: 'Name', dataIndex: 'name', flex: 1 },
+                { text: 'Email', dataIndex: 'email', flex: 1 }
+            ],
+            selModel: 'rowmodel',
+            tbar: [
+                { text: 'Delete', itemId: 'deleteBtn' }
+            ]
+        },
+        // {
+        //     xtype: 'userform'
+        // }
+    ]
+});
+Ext.application({
+    name: 'MyApp',
+    //controllers configuration: Registring controllers
+    controllers: [
+        // 'MyApp.controller.MainController'
+    ],
+    launch: function () {
+        Ext.create('MyApp.view.main.Main', {
+            renderTo: Ext.getBody()
+        })
+    }
+});
+************************************************************************************************************************************************************
+											Setup local mock api server
+
+You can follow this link
+https://github.com/typicode/json-server
+
+mock-server>npx json-server db.json
+
+Proxy configuration:
+proxy: {
+        //rest api configuration
+        type: 'rest',
+        //url: 'https://jsonplaceholder.typicode.com/users',
+        url: 'http://localhost:3000/users',
+        reader: {
+            type: 'json'
+        },
+        writer: {
+            type: 'json',
+            writeAllFields: true
+        }
+    }
+**********************************************************************************************************************************************************\
+									 CURD operations Using Rest
+***********************************************************************************************************************************************************
+
+Store apis:
+
+Store has apis which maps against HTTP verbs automatically
+
+store.add  ---- >POST /URL
+store.remove --->DELETE /URL
+store.set  ----->PUT  /URL				
+
+//Model
+Ext.define('MyApp.model.User', {
+    extend: 'Ext.data.Model',
+    fields: ['id', 'name', 'email']
+})
+//store
+Ext.define('MyApp.store.Users', {
+    extend: 'Ext.data.Store',
+    alias: 'store.users',
+    model: 'MyApp.model.User',
+    autoLoad: true, //load data from the api when ever data changes
+    autoSync: false,  // true when ever the grid changes data , automatically updates api
+    // false manually you handle api curd operation
+    proxy: {
+        //rest api configuration
+        type: 'rest',
+        //url: 'https://jsonplaceholder.typicode.com/users',
+        url: 'http://localhost:3000/users',
+        reader: {
+            type: 'json'
+        },
+        writer: {
+            type: 'json',
+            writeAllFields: true
+        }
+    }
+})
+Ext.define('MyApp.view.main.UserForm', {
+    extend: 'Ext.form.Panel',
+    xtype: 'userform',
+    bodyPadding: 10,
+    defaultType: 'textfield',
+    width: 300,
+    items: [
+        { name: 'id', xtype: 'hiddenfield' },
+        { fieldLabel: 'Name', name: 'name', allowBlank: false },
+        { fieldLabel: 'Email', name: 'email', allowBlank: false, vtype: 'email' }
+    ],
+    buttons: [
+        {
+            text: 'Save',
+            itemId: 'saveBtn'
+        },
+        {
+            text: 'Reset',
+            handler: function () {
+                var form = this.up('form')
+                form.getForm().reset() // clear the form fields
+                form.down('#saveBtn').setText('Save')
+            }
+        }
+    ]
+});
+Ext.define('MyApp.controller.MainController', {
+    extend: 'Ext.app.Controller',
+    refs: [
+        { ref: 'userForm', selector: 'userform' },
+        { ref: 'userGrid', selector: 'grid' }
+    ],
+
+    init: function () {
+        this.control({
+            'button#saveBtn': {
+                click: this.onSaveUser
+            },
+            'button#deleteBtn': {
+                click: this.onDeleteUser
+            },
+            'grid#userGrid': {
+                select: this.onUserSelect
+            }
+        });
+    },
+    onSaveUser: function () {
+        var formPanel = this.getUserForm()
+        var form = formPanel.getForm()
+        var grid = this.getUserGrid()
+        var store = grid.getStore()
+        if (!form.isValid()) {
+            return;
+        }
+        var values = form.getValues()
+        var record = form.getRecord()
+        if (record) {
+            record.set(values)
+        } else {
+            record = Ext.create('MyApp.model.User', values)
+            //add : HTTP POST  url
+            store.add(record)
+        }
+        //sync syncs with back end
+        store.sync({
+            success: function () {
+                form.reset()
+                formPanel.down('#saveBtn').setText('Save')
+                //GET
+                store.load()
+            },
+            failure: function () {
+                Ext.Msg.alert('Error', 'Failed To Save')
+            }
+        })
+    },
+    onDeleteUser: function () {
+        const grid = this.getUserGrid(),
+            record = grid.getSelectionModel().getSelection()[0],
+            store = grid.getStore();
+
+        if (!record) {
+            Ext.Msg.alert('Warning', 'No user selected');
+            return;
+        }
+        Ext.Msg.confirm('Confirm', 'Delete selected user?', function (choice) {
+            if (choice === 'yes') {
+                store.remove(record);
+                store.sync({
+                    success: function () {
+                        store.load()
+                    },
+                    failure: function () {
+                        Ext.Msg.alert('Error', 'Failed to delete')
+                    }
+                });
+            }
+        });
+    },
+    onUserSelect: function (grid, record) {
+        const form = this.getUserForm().getForm();
+        form.loadRecord(record);
+        this.getUserForm().down('#saveBtn').setText('Update');
+
+    }
+})
+
+Ext.define('MyApp.view.main.Main', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'mainview',
+    layout: 'hbox',
+    padding: 10,
+    items: [
+        {
+            xtype: 'grid',
+            title: 'Users',
+            itemId: 'userGrid',
+            width: 400,
+            height: 300,
+            margin: '0 20 0 0',
+            store: {
+                type: 'users'
+            },
+            columns: [
+                { text: 'ID', dataIndex: 'id', width: 50 },
+                { text: 'Name', dataIndex: 'name', flex: 1 },
+                { text: 'Email', dataIndex: 'email', flex: 1 }
+            ],
+            selModel: 'rowmodel',
+            tbar: [
+                { text: 'Delete', itemId: 'deleteBtn' }
+            ]
+        },
+        {
+            xtype: 'userform'
+        }
+    ]
+});
+Ext.application({
+    name: 'MyApp',
+    //controllers configuration: Registring controllers
+    controllers: [
+        'MyApp.controller.MainController'
+    ],
+    launch: function () {
+        Ext.create('MyApp.view.main.Main', {
+            renderTo: Ext.getBody()
+        })
+    }
+});
+************************************************************************************************************************************************************
 

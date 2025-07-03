@@ -1,14 +1,54 @@
+//Model
 Ext.define('MyApp.model.User', {
     extend: 'Ext.data.Model',
     fields: ['id', 'name', 'email']
-});
+})
+//store
 Ext.define('MyApp.store.Users', {
     extend: 'Ext.data.Store',
-    model: 'MyApp.model.User',
     alias: 'store.users',
-    data: [
-        { id: 1, name: 'John Doe', email: 'john@example.com' },
-        { id: 2, name: 'Jane Smith', email: 'jane@example.com' }
+    model: 'MyApp.model.User',
+    autoLoad: true, //load data from the api when ever data changes
+    autoSync: false,  // true when ever the grid changes data , automatically updates api
+    // false manually you handle api curd operation
+    proxy: {
+        //rest api configuration
+        type: 'rest',
+        //url: 'https://jsonplaceholder.typicode.com/users',
+        url: 'http://localhost:3000/users',
+        reader: {
+            type: 'json'
+        },
+        writer: {
+            type: 'json',
+            writeAllFields: true
+        }
+    }
+})
+Ext.define('MyApp.view.main.UserForm', {
+    extend: 'Ext.form.Panel',
+    xtype: 'userform',
+    bodyPadding: 10,
+    defaultType: 'textfield',
+    width: 300,
+    items: [
+        { name: 'id', xtype: 'hiddenfield' },
+        { fieldLabel: 'Name', name: 'name', allowBlank: false },
+        { fieldLabel: 'Email', name: 'email', allowBlank: false, vtype: 'email' }
+    ],
+    buttons: [
+        {
+            text: 'Save',
+            itemId: 'saveBtn'
+        },
+        {
+            text: 'Reset',
+            handler: function () {
+                var form = this.up('form')
+                form.getForm().reset() // clear the form fields
+                form.down('#saveBtn').setText('Save')
+            }
+        }
     ]
 });
 Ext.define('MyApp.controller.MainController', {
@@ -32,64 +72,66 @@ Ext.define('MyApp.controller.MainController', {
         });
     },
     onSaveUser: function () {
-        var form = this.getUserForm().getForm()
-        var values = form.getValues()
-        //store has lot of curd apis
-        var store = this.getUserGrid().getStore()
-        if (form.isValid()) {
-            if (values.id) {
-                //update logic
-                var record = store.getById(parseInt(values.id))
-                record.set(values)
-            } else {
-                //create new Model then inser into grid
-                store.add(values)
-            }
-            store.commitChanges()
-            form.reset()
-        }
-    },
-    onDeleteUser: function () {
-        var grid = this.getUserGrid()
-        var selected = grid.getSelectionModel().getSelection()[0]
-        if (selected) {
-            grid.getStore().remove(selected)
-        } else {
-            Ext.Msg.alert('Error', 'Please Select row to be deleted')
-        }
-    },
-    onUserSelect: function (grid, record) {
         var formPanel = this.getUserForm()
         var form = formPanel.getForm()
-        form.loadRecord(record)
-        console.log('Selected Record', record.getData())
-        formPanel.down('#saveBtn').setText('Update')
+        var grid = this.getUserGrid()
+        var store = grid.getStore()
+        if (!form.isValid()) {
+            return;
+        }
+        var values = form.getValues()
+        var record = form.getRecord()
+        if (record) {
+            record.set(values)
+        } else {
+            record = Ext.create('MyApp.model.User', values)
+            //add : HTTP POST  url
+            store.add(record)
+        }
+        //sync syncs with back end
+        store.sync({
+            success: function () {
+                form.reset()
+                formPanel.down('#saveBtn').setText('Save')
+                //GET
+                store.load()
+            },
+            failure: function () {
+                Ext.Msg.alert('Error', 'Failed To Save')
+            }
+        })
+    },
+    onDeleteUser: function () {
+        const grid = this.getUserGrid(),
+            record = grid.getSelectionModel().getSelection()[0],
+            store = grid.getStore();
+
+        if (!record) {
+            Ext.Msg.alert('Warning', 'No user selected');
+            return;
+        }
+        Ext.Msg.confirm('Confirm', 'Delete selected user?', function (choice) {
+            if (choice === 'yes') {
+                store.remove(record);
+                store.sync({
+                    success: function () {
+                        store.load()
+                    },
+                    failure: function () {
+                        Ext.Msg.alert('Error', 'Failed to delete')
+                    }
+                });
+            }
+        });
+    },
+    onUserSelect: function (grid, record) {
+        const form = this.getUserForm().getForm();
+        form.loadRecord(record);
+        this.getUserForm().down('#saveBtn').setText('Update');
+
     }
 })
-Ext.define('MyApp.view.main.UserForm', {
-    extend: 'Ext.form.Panel',
-    xtype: 'userform',
-    bodyPadding: 10,
-    defaultType: 'textfield',
-    width: 300,
-    items: [
-        { name: 'id', xtype: 'hiddenfield' },
-        { fieldLabel: 'Name', name: 'name', allowBlank: false },
-        { fieldLabel: 'Email', name: 'email', allowBlank: false, vtype: 'email' }
-    ],
-    buttons: [
-        {
-            text: 'Save',
-            itemId: 'saveBtn'
-        },
-        {
-            text: 'Reset',
-            handler: function () {
-                this.up('form').getForm().reset();
-            }
-        }
-    ]
-});
+
 Ext.define('MyApp.view.main.Main', {
     extend: 'Ext.panel.Panel',
     xtype: 'mainview',
@@ -98,7 +140,6 @@ Ext.define('MyApp.view.main.Main', {
     items: [
         {
             xtype: 'grid',
-            reference: 'userGrid', // refered by refs inside controller
             title: 'Users',
             itemId: 'userGrid',
             width: 400,
@@ -123,7 +164,7 @@ Ext.define('MyApp.view.main.Main', {
     ]
 });
 Ext.application({
-    name: 'MyMVCApp',
+    name: 'MyApp',
     //controllers configuration: Registring controllers
     controllers: [
         'MyApp.controller.MainController'
@@ -134,3 +175,4 @@ Ext.application({
         })
     }
 });
+

@@ -1,0 +1,95 @@
+											Building and deploying app into production
+************************************************************************************************************************************************************
+
+How to build ext  js application and move to production?
+
+Buliding App:
+
+There are two types of build
+
+1.Development build - dev build
+2.Production build  - prod build
+
+Prod Build
+
+sencha app build production
+
+Deployment:
+ You can deploy the application in any server env
+
+1.IIS
+2.Apache
+3.Nginx
+4.java server
+5.node.js
+
+Use case : node.js as web server
+
+Steps:
+G:\Tungsten\extapps>mkdir prodExtServer
+
+G:\Tungsten\extapps>cd prodExtServer
+
+G:\Tungsten\extapps\prodExtServer>npm init --yes
+Wrote to G:\Tungsten\extapps\prodExtServer\package.json:
+
+{
+  "name": "prodextserver",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
+G:\Tungsten\extapps\prodExtServer>npm i express
+
+added 67 packages, and audited 68 packages in 2s
+
+14 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+
+server.js
+const express = require('express')
+const path = require('node:path')
+const app = express()
+
+//map ext app 
+const staticPath = path.join(__dirname, 'build', 'production', 'ProdApp');
+//mapping ext app with express(node) server
+app.use(express.static(staticPath))
+
+//
+app.get('/', (req, res) => {
+    res.sendFile(path.join(staticPath, 'index.html'))
+})
+const PORT = process.env.PORT || 8080
+//start web server
+app.listen(PORT, () => {
+    console.log(`Ext Server is Running at http://localhost:${PORT}`)
+})
+
+copy build folder of ext into node project
+G:\Tungsten\extapps\prodExtServer>dir
+ Volume in drive G is Training
+ Volume Serial Number is 0EBA-602D
+
+ Directory of G:\Tungsten\extapps\prodExtServer
+
+07/04/2025  12:30 PM    <DIR>          .
+07/04/2025  12:22 PM    <DIR>          ..
+07/04/2025  12:30 PM    <DIR>          build    -------------------------------> Ext app build folder
+07/04/2025  12:24 PM    <DIR>          node_modules
+07/04/2025  12:24 PM            28,973 package-lock.json
+07/04/2025  12:24 PM               298 package.json
+07/04/2025  12:29 PM               524 server.js
+               3 File(s)         29,795 bytes
+               4 Dir(s)  285,864,693,760 bytes free
+

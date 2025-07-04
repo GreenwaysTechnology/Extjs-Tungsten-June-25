@@ -1,0 +1,557 @@
+											State Management
+
+	State management in Ext JS 7.x allows you to preserve the state of UI components—like grids, panels, or windows—across page reloads or sessions. This is especially useful for maintaining user preferences such as column widths, sorting, or collapsed panels.
+
+1. Basic Concept
+
+State management tracks component state changes.
+Stores state in a state provider (typically localStorage or cookies).
+Automatically restores state when the application reloads.
+
+2. Common Use Cases
+Column width/order/visibility in grids
+Panel collapsed/expanded state
+Window size/position
+Tab selection
+
+ 3. Key Classes
+
+| Class                            | Description                                                 |
+| -------------------------------- | ----------------------------------------------------------- |
+| `Ext.state.Manager`              | Central registry for saving and restoring component states. |
+| `Ext.state.Provider`             | Abstract base for state persistence mechanisms.             |
+| `Ext.state.LocalStorageProvider` | Uses `localStorage` to persist states.                      |
+| `Ext.state.CookieProvider`       | Uses cookies (less common in modern apps).                  |
+
+ 4. Enabling State Management in App
+Step 1: Configure the state provider (usually in app.js or Application.js)
+
+app.js
+Ext.application({
+    name: 'MyApp',
+    launch: function () {
+        // Enable LocalStorage-based state management
+        Ext.state.Manager.setProvider(new Ext.state.LocalStorageProvider());
+
+        Ext.create('MyApp.view.Main', {
+            renderTo: Ext.getBody()
+        });
+    }
+});
+
+Lifecycle Integration
+Use state management with lifecycle hooks:
+
+getState(): Return current state
+applyState(state): Apply restored state
+
+Eg:
+ Storing state when page loads, reload state
+Ext.define('MyApp.view.Main', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'mainview',
+    title: 'Stateful Form Example',
+    width: 500,
+    bodyPadding: 20,
+    renderTo: Ext.getBody(),
+    stateful: true,
+    stateId: 'registration-form',
+
+    layout: 'anchor',
+
+    items: [
+        {
+            xtype: 'textfield',
+            fieldLabel: 'Name',
+            name: 'name',
+            itemId: 'nameField',
+            anchor: '100%'
+        },
+        {
+            xtype: 'textfield',
+            fieldLabel: 'Email',
+            name: 'email',
+            itemId: 'emailField',
+            anchor: '100%'
+        },
+        {
+            xtype: 'button',
+            text: 'Clear Fields',
+            margin: '10 0 0 0',
+            handler: function (btn) {
+                const panel = btn.up('panel');
+                panel.down('#nameField').setValue('');
+                panel.down('#emailField').setValue('');
+                Ext.state.Manager.getProvider().clear(panel.stateId);
+            }
+        }
+    ],
+
+    // Save state (field values)
+    getState: function () {
+        console.log('getState is called')
+        return {
+            name: this.down('#nameField').getValue(),
+            email: this.down('#emailField').getValue()
+        };
+    },
+
+    // Restore state (field values)
+    applyState: function (state) {
+        console.log('applyState is called')
+        this.down('#nameField').setValue(state.name || 'Name');
+        this.down('#emailField').setValue(state.email || 'name@gmail.com');
+    }
+});
+
+Ext.application({
+    name: 'MyApp',
+
+    launch: function () {
+        // Enable LocalStorage-based state management
+        Ext.state.Manager.setProvider(new Ext.state.LocalStorageProvider());
+
+        Ext.create('MyApp.view.Main', {
+            renderTo: Ext.getBody()
+        });
+    }
+});
+..........................................................................................................................................................................................................................................
+										Storing State using code
+
+Ext.define('MyApp.view.Main', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'mainview',
+    title: 'Manual Form State Save/Load Example',
+    width: 500,
+    bodyPadding: 20,
+    layout: 'anchor',
+
+    stateId: 'manual-form-state', // Used as localStorage key
+
+    items: [
+        {
+            xtype: 'textfield',
+            fieldLabel: 'Name',
+            itemId: 'nameField',
+            anchor: '100%'
+        },
+        {
+            xtype: 'textfield',
+            fieldLabel: 'Email',
+            itemId: 'emailField',
+            anchor: '100%'
+        },
+        {
+            xtype: 'container',
+            layout: 'hbox',
+            margin: '10 0 0 0',
+            defaults: {
+                margin: '0 10 0 0'
+            },
+            items: [
+                {
+                    xtype: 'button',
+                    text: 'Save to LocalStorage',
+                    handler: function (btn) {
+                        const panel = btn.up('panel');
+                        const name = panel.down('#nameField').getValue();
+                        const email = panel.down('#emailField').getValue();
+
+                        Ext.state.Manager.getProvider().set(panel.stateId, {
+                            name: name,
+                            email: email
+                        });
+                        Ext.Msg.alert('Success', 'Form data saved to localStorage!');
+                        panel.down('#nameField').setValue('')
+                        panel.down('#emailField').setValue();
+
+                    }
+                },
+                {
+                    xtype: 'button',
+                    text: 'Load from LocalStorage',
+                    handler: function (btn) {
+                        const panel = btn.up('panel');
+                        const state = Ext.state.Manager.getProvider().get(panel.stateId);
+
+                        if (state) {
+                            panel.down('#nameField').setValue(state.name || '');
+                            panel.down('#emailField').setValue(state.email || '');
+                            Ext.Msg.alert('Loaded', 'Form data loaded from localStorage!');
+                        } else {
+                            Ext.Msg.alert('No Data', 'Nothing found in localStorage!');
+                        }
+                    }
+                },
+                {
+                    xtype: 'button',
+                    text: 'Clear',
+                    handler: function (btn) {
+                        const panel = btn.up('panel');
+                        panel.down('#nameField').setValue('');
+                        panel.down('#emailField').setValue('');
+
+                        Ext.state.Manager.getProvider().clear(panel.stateId);
+
+                        Ext.Msg.alert('Cleared', 'Form and localStorage cleared.');
+                    }
+                }
+            ]
+        }
+    ]
+});
+
+
+
+Ext.application({
+    name: 'MyApp',
+
+    launch: function () {
+        // Enable LocalStorage-based state management
+        Ext.state.Manager.setProvider(new Ext.state.LocalStorageProvider());
+
+        Ext.create('MyApp.view.Main', {
+            renderTo: Ext.getBody()
+        });
+    }
+});
+**********************************************************************************************************************************************************
+using Ext.form.Panel with:
+
+Multiple fields
+getForm().getValues() for storing all field data
+Manual Save, Load, and Clear buttons
+Uses Ext.state.LocalStorageProvider under a custom stateId
+
+
+Ext.define('MyApp.view.MainForm', {
+    extend: 'Ext.form.Panel',
+    xtype: 'mainform',
+    title: 'Stateful Form with getValues()',
+    width: 500,
+    bodyPadding: 20,
+    renderTo: Ext.getBody(),
+
+    stateId: 'form-state',
+    defaults: {
+        anchor: '100%',
+        allowBlank: false,
+        msgTarget: 'side',
+        labelWidth: 100
+    },
+
+    items: [
+        {
+            xtype: 'textfield',
+            fieldLabel: 'Full Name',
+            name: 'name'
+        },
+        {
+            xtype: 'textfield',
+            fieldLabel: 'Email',
+            name: 'email',
+            vtype: 'email'
+        },
+        {
+            xtype: 'numberfield',
+            fieldLabel: 'Age',
+            name: 'age',
+            minValue: 1,
+            maxValue: 120
+        },
+        {
+            xtype: 'combo',
+            fieldLabel: 'Gender',
+            name: 'gender',
+            store: ['Male', 'Female', 'Other'],
+            forceSelection: true
+        }
+    ],
+
+    buttons: [
+        {
+            text: 'Save to LocalStorage',
+            handler: function (btn) {
+                const form = btn.up('form');
+                const values = form.getForm().getValues();
+                Ext.state.Manager.getProvider().set(form.stateId, values);
+                form.getForm().reset();
+                Ext.Msg.alert('Saved', 'Form values saved to localStorage.');
+            }
+        },
+        {
+            text: 'Load from LocalStorage',
+            handler: function (btn) {
+                const form = btn.up('form');
+                const state = Ext.state.Manager.getProvider().get(form.stateId);
+
+                if (state) {
+                    form.getForm().setValues(state);
+                    Ext.Msg.alert('Loaded', 'Form values loaded from localStorage.');
+                } else {
+                    Ext.Msg.alert('Not Found', 'No data found in localStorage.');
+                }
+            }
+        },
+        {
+            text: 'Clear All',
+            handler: function (btn) {
+                const form = btn.up('form');
+                form.getForm().reset();
+                Ext.state.Manager.getProvider().clear(form.stateId);
+                Ext.Msg.alert('Cleared', 'Form and saved state cleared.');
+            }
+        }
+    ]
+});
+
+
+Ext.application({
+    name: 'MyApp',
+
+    launch: function () {
+        // Enable LocalStorage-based state management
+        Ext.state.Manager.setProvider(new Ext.state.LocalStorageProvider());
+
+        Ext.create('MyApp.view.MainForm', {
+            renderTo: Ext.getBody()
+        });
+    }
+});
+***********************************************************************************************************************************************************
+					Multi-step form (Wizard) using CardLayout
+						MVVM architecture (ViewModel + ViewController)
+						LocalStorage integration for form persistence
+						Final REST API submission of collected data
+
+Ext.define('MyApp.model.User', {
+    extend: 'Ext.data.Model',
+    fields: ['firstName', 'lastName', 'email', 'age']
+});
+Ext.define('MyApp.store.WizardData', {
+    extend: 'Ext.data.Store',
+    model: 'MyApp.model.User',
+    autoLoad: true,
+    proxy: {
+        type: 'memory'
+    }
+});
+
+Ext.define('MyApp.view.wizard.WizardModel', {
+    extend: 'Ext.app.ViewModel',
+    alias: 'viewmodel.wizardmodel',
+
+    data: {
+        userData: {
+            firstName: '',
+            lastName: '',
+            email: '',
+            age: ''
+        }
+    }
+});
+Ext.define('MyApp.view.wizard.WizardController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.wizardcontroller',
+
+    onNext: function () {
+        let wizard = this.getView(),
+            layout = wizard.getLayout(),
+            activeItem = layout.getActiveItem(),
+            index = wizard.items.indexOf(activeItem);
+
+        if (index < wizard.items.length - 1) {
+            layout.setActiveItem(index + 1);
+        }
+    },
+
+    onBack: function () {
+        let wizard = this.getView(),
+            layout = wizard.getLayout(),
+            activeItem = layout.getActiveItem(),
+            index = wizard.items.indexOf(activeItem);
+
+        if (index > 0) {
+            layout.setActiveItem(index - 1);
+        }
+    },
+
+    onSaveToLocal: function () {
+        const data = this.getViewModel().getData().userData;
+        localStorage.setItem('wizardUserData', JSON.stringify(data));
+        Ext.Msg.alert('Saved', 'Data saved to localStorage.');
+    },
+
+    onLoadFromLocal: function () {
+        const saved = localStorage.getItem('wizardUserData');
+        if (saved) {
+            this.getViewModel().set('userData', JSON.parse(saved));
+        } else {
+            Ext.Msg.alert('Info', 'No data in localStorage');
+        }
+    },
+
+    onSubmit: function () {
+        const userData = this.getViewModel().get('userData');
+
+        Ext.Ajax.request({
+            url: 'https://jsonplaceholder.typicode.com/posts',
+            method: 'POST',
+            jsonData: userData,
+            success: function () {
+                Ext.Msg.alert('Success', 'Submitted to server!');
+                localStorage.removeItem('wizardUserData');
+            },
+            failure: function () {
+                Ext.Msg.alert('Error', 'Submission failed');
+            }
+        });
+    }
+});
+
+Ext.define('MyApp.view.wizard.WizardController', {
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.wizardcontroller',
+
+    onNext: function () {
+        let wizard = this.getView(),
+            layout = wizard.getLayout(),
+            activeItem = layout.getActiveItem(),
+            index = wizard.items.indexOf(activeItem);
+
+        if (index < wizard.items.length - 1) {
+            layout.setActiveItem(index + 1);
+        }
+    },
+
+    onBack: function () {
+        let wizard = this.getView(),
+            layout = wizard.getLayout(),
+            activeItem = layout.getActiveItem(),
+            index = wizard.items.indexOf(activeItem);
+
+        if (index > 0) {
+            layout.setActiveItem(index - 1);
+        }
+    },
+
+    onSaveToLocal: function () {
+        const data = this.getViewModel().getData().userData;
+        localStorage.setItem('wizardUserData', JSON.stringify(data));
+        Ext.Msg.alert('Saved', 'Data saved to localStorage.');
+    },
+
+    onLoadFromLocal: function () {
+        const saved = localStorage.getItem('wizardUserData');
+        if (saved) {
+            this.getViewModel().set('userData', JSON.parse(saved));
+        } else {
+            Ext.Msg.alert('Info', 'No data in localStorage');
+        }
+    },
+
+    onSubmit: function () {
+        const userData = this.getViewModel().get('userData');
+
+        Ext.Ajax.request({
+            url: 'https://jsonplaceholder.typicode.com/posts',
+            method: 'POST',
+            jsonData: userData,
+            success: function () {
+                Ext.Msg.alert('Success', 'Submitted to server!');
+                localStorage.removeItem('wizardUserData');
+            },
+            failure: function () {
+                Ext.Msg.alert('Error', 'Submission failed');
+            }
+        });
+    }
+});
+Ext.define('MyApp.view.wizard.Step1', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'wizardstep1',
+    bodyPadding: 10,
+    layout: 'form',
+    title: 'Step 1 - Basic Info',
+
+    items: [
+        {
+            xtype: 'textfield',
+            fieldLabel: 'First Name',
+            bind: '{userData.firstName}'
+        },
+        {
+            xtype: 'textfield',
+            fieldLabel: 'Last Name',
+            bind: '{userData.lastName}'
+        }
+    ]
+});
+Ext.define('MyApp.view.wizard.Step2', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'wizardstep2',
+    bodyPadding: 10,
+    layout: 'form',
+    title: 'Step 2 - Contact Info',
+
+    items: [
+        {
+            xtype: 'textfield',
+            fieldLabel: 'Email',
+            bind: '{userData.email}'
+        }
+    ]
+});
+Ext.define('MyApp.view.wizard.Step3', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'wizardstep3',
+    bodyPadding: 10,
+    layout: 'form',
+    title: 'Step 3 - Additional Info',
+
+    items: [
+        {
+            xtype: 'numberfield',
+            fieldLabel: 'Age',
+            bind: '{userData.age}'
+        }
+    ]
+});
+Ext.define('MyApp.view.wizard.Wizard', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'wizardpanel',
+    requires: [
+        'MyApp.view.wizard.Step1',
+        'MyApp.view.wizard.Step2',
+        'MyApp.view.wizard.Step3'
+    ],
+    viewModel: 'wizardmodel',
+    controller: 'wizardcontroller',
+    width: 500,
+    height: 300,
+    layout: 'card',
+    bodyPadding: 10,
+    renderTo: Ext.getBody(),
+
+    items: [
+        { xtype: 'wizardstep1' },
+        { xtype: 'wizardstep2' },
+        { xtype: 'wizardstep3' }
+    ],
+
+    bbar: [
+        { text: 'Back', handler: 'onBack' },
+        { text: 'Next', handler: 'onNext' },
+        '->',
+        { text: 'Save Local', handler: 'onSaveToLocal' },
+        { text: 'Load Local', handler: 'onLoadFromLocal' },
+        { text: 'Submit', handler: 'onSubmit' }
+    ]
+});
+Ext.application({
+    name: 'MyApp',
+    launch: function () {
+        Ext.create('MyApp.view.wizard.Wizard');
+    }
+});

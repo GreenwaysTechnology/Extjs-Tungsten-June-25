@@ -93,3 +93,6 @@ G:\Tungsten\extapps\prodExtServer>dir
                3 File(s)         29,795 bytes
                4 Dir(s)  285,864,693,760 bytes free
 
+Run:
+
+ G:\Tungsten\extapps\prodExtServer> node server.js

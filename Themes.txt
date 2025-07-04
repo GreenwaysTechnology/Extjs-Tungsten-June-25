@@ -1,0 +1,245 @@
+In Ext JS, themes and styles are used to control the look and feel of your application—colors, fonts, spacing, icons, and component appearance. Ext JS offers a powerful theming system that allows both predefined themes and custom themes.
+
+🔹 1. Built-in Themes (Classic & Modern Toolkits)
+✅ Classic Toolkit Themes
+
+Ext JS Classic has these built-in themes:
+
+ext-theme-classic
+ext-theme-gray
+ext-theme-neptune
+ext-theme-triton
+ext-theme-aria (Accessibility)
+ext-theme-crisp
+ext-theme-crisp-touch
+
+✅ Modern Toolkit Themes
+ext-modern-theme-material
+ext-modern-theme-ios
+ext-modern-theme-neptune
+ext-modern-theme-triton
+
+create classic project
+sencha generate app -ext -classic MyApp ./MyClassicApp
+
+Just explore app.json, there you can find default theme ,
+
+{
+    "name": "ThemeDemoApp",
+    "namespace": "ThemeDemoApp",
+    "version": "1.0.0.0",
+    "framework": "ext",
+    "toolkit": "classic",
+    "theme": "theme-triton"
+}
+
+if you want to change styles just add or edit existing scss files
+
+Application.scss file
+
+/*
+ *  This file can be used to set variables and supply global styling.  View specific 
+ *  styling should be located the view's corresponding scss file.
+ */
+$enable-font-awesome: dynamic(true);
+
+Main.scss
+/*
+ * This file contains styling for the Main view.
+ */
+
+/*
+ * Generates a set of style rules for the "navigation" tab UI.
+ */
+@include extjs-tab-panel-ui(
+    $ui: 'navigation',
+    $ui-tab-background-color: transparent,
+    $ui-tab-background-color-over: #21cda2,
+    $ui-tab-background-color-active: #e52b2b,
+    $ui-tab-background-gradient: 'none',
+    $ui-tab-background-gradient-over: 'none',
+    $ui-tab-background-gradient-active: 'none',
+    $ui-tab-color: #e4601a,
+    $ui-tab-color-over: #c4c4c4,
+    $ui-tab-color-active: #fff,
+    $ui-tab-glyph-color: #acacac,
+    $ui-tab-glyph-color-over: #c4c4c4,
+    $ui-tab-glyph-color-active: #fff,
+    $ui-tab-glyph-opacity: 1,
+    $ui-tab-border-radius: 0,
+    $ui-tab-border-width: 0,
+    $ui-tab-inner-border-width: 0,
+    $ui-tab-padding: 24px,
+    $ui-tab-margin: 0,
+    $ui-tab-font-size: 15px,
+    $ui-tab-font-size-over: 15px,
+    $ui-tab-font-size-active: 15px,
+    $ui-tab-line-height: 19px,
+    $ui-tab-font-weight: bold,
+    $ui-tab-font-weight-over: bold,
+    $ui-tab-font-weight-active: bold,
+    $ui-tab-icon-width: 24px,
+    $ui-tab-icon-height: 24px,
+    $ui-tab-icon-spacing: 5px,
+    $ui-bar-background-color: #404040,
+    $ui-bar-background-gradient: 'none',
+    $ui-bar-padding: 0,
+    $ui-strip-height: 0
+);
+
+/*
+ * Generates a set of style rules for the "navigation" panel UI.
+ */
+@include extjs-panel-ui(
+    $ui: 'navigation',
+    $ui-header-color: #fff,
+    $ui-header-glyph-color: #fff,
+    $ui-header-glyph-opacity: 1,
+    $ui-header-font-size: 20px,
+    $ui-header-line-height: 24px,
+    $ui-header-font-weight: bold,
+    $ui-header-icon-height: 24px,
+    $ui-header-icon-width: 24px,
+    $ui-header-icon-spacing: 15px,
+    $ui-header-background-color: $base-color,
+    $ui-header-padding: 0,
+    $ui-header-text-margin: 36px,
+    $ui-header-noborder-adjust: false
+);
+
+.x-title-icon-navigation {
+    font-family: 'Font Awesome 5 Free';
+    color: #fff;
+    font-size: 24px;
+    line-height: 24px;
+}
+
+.x-tab-icon-el-navigation {
+    font-family: 'Font Awesome 5 Free';
+    color: #acacac;
+
+    .x-tab-over & {
+        color: #c4c4c4;
+    }
+
+    .x-tab-active & {
+        color: #fff;
+    }
+}
+
+.x-panel-header-title-navigation > .x-title-text-navigation:after {
+    top: 30px;
+    right: -24px;
+}
+***********************************************************************************************************************************************************
+												Building a custom Theme
+************************************************************************************************************************************************************
+If you are going to create your own theme, you have to create by inheriting existing core themes only - just like class inheritance
+
+Base theme classes:
+
+theme-base
+    This is base theme for all other themes and  is the only theme that does not have a parent theme.
+   It contains bare minimum set of CSS rules that are absolutely for All Ext Components, and layouts to work correctly.
+
+theme-neutral
+      It extends theme-base, contains vas majority of configurable style rules
+
+theme-Neptune
+      It extends theme-base which extends neutral
+
+theme-triton
+     It extends Neptune, suitable for modern browsers
+
+etc....
+
+										Base
+					-------------------------------------------------------------------------
+										   |
+			  						 	Natural
+				-------------------------------------------------------------------------------------------
+				Neptune													Classic
+				|															|
+               Triton  Crisp  ARIA 													Gray	
+			|
+	   Your custom Theme
+
+Steps for creating custom themes:
+..........................................................
+
+Step 1 : Generate using sencha cmd
+
+sencha generate theme my-classic-theme 
+
+after this command , you can find packages folder
+
+G:\Tungsten\extapps\ThemeDemoApp\packages>dir
+ Volume in drive G is Training
+ Volume Serial Number is 0EBA-602D
+
+ Directory of G:\Tungsten\extapps\ThemeDemoApp\packages
+
+07/04/2025  10:36 AM    <DIR>          .
+07/04/2025  10:36 AM    <DIR>          ..
+07/04/2025  10:36 AM    <DIR>          local
+               0 File(s)              0 bytes
+               3 Dir(s)  286,233,497,600 bytes free
+
+G:\Tungsten\extapps\ThemeDemoApp\packages\local>dir
+ Volume in drive G is Training
+ Volume Serial Number is 0EBA-602D
+
+ Directory of G:\Tungsten\extapps\ThemeDemoApp\packages\local
+
+07/04/2025  10:36 AM    <DIR>          .
+07/04/2025  10:36 AM    <DIR>          ..
+07/04/2025  10:36 AM    <DIR>          my-classic-theme
+ 
+G:\Tungsten\extapps\ThemeDemoApp\packages\local\my-classic-theme>dir
+ Volume in drive G is Training
+ Volume Serial Number is 0EBA-602D
+
+ Directory of G:\Tungsten\extapps\ThemeDemoApp\packages\local\my-classic-theme
+
+07/04/2025  10:36 AM    <DIR>          .
+07/04/2025  10:36 AM    <DIR>          ..
+07/04/2025  10:36 AM             3,583 build.xml
+07/04/2025  10:36 AM    <DIR>          examples
+07/04/2025  10:36 AM    <DIR>          licenses
+07/04/2025  10:36 AM    <DIR>          overrides
+07/04/2025  10:36 AM             9,854 package.json
+07/04/2025  10:36 AM                32 Readme.md
+07/04/2025  10:36 AM    <DIR>          resources
+07/04/2025  10:36 AM    <DIR>          sass
+07/04/2025  10:36 AM    <DIR>          src
+               3 File(s)         13,469 bytes
+               8 Dir(s)  286,233,497,600 bytes free
+
+
+package.json
+
+ "extend": "theme-triton",
+*************************************
+sass folder:
+
+sass/src - contains rules and UI mixin calls that can use the variables defined in "sass/vars"
+sass/etc -  additional utility and mixins
+sass/var - variables that to be overriden
+
+eg: i want to change panel sytle
+sass/var/panel/Panel.scss
+
+Eg:
+
+sass/var/Component.scss
+$base-color:#317040;
+
+Here changing core color.
+
+app.json
+  "theme" : "my-classic-theme",
+
+sencha app watch 
+
+ you will now see the new theme color is updated.
+***********************************************************************************************************************************************************
